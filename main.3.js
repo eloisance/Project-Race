@@ -176,9 +176,25 @@ function start()
 		renderingEnvironment.onWindowResize(window.innerWidth,window.innerHeight);
 	}
 
+    var items = [
+        [-220, 0],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220],
+        [-220, 220]
+    ];
+
 	function render() { 
 		requestAnimationFrame( render );
 		handleKeys();
+
 		// Vehicle stabilization 
 		vehicle.goUp(vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0, vehicle.weight()/4.0) ;
 		vehicle.stopAngularSpeedsXY() ;
@@ -203,10 +219,9 @@ function start()
 		// Camera
 		console.log('x: ' + NAV.x);
 		console.log('y: ' + NAV.y);
-
-		renderingEnvironment.camera.position.x = NAV.x ;
-		renderingEnvironment.camera.position.y = NAV.y ;
-		renderingEnvironment.camera.position.z = NAV.z+50+vehicle.speed.length()*2 ;
+		renderingEnvironment.camera.position.x = items[NAV.findActive(NAV.x, NAV.y)][0];
+		renderingEnvironment.camera.position.y = items[NAV.findActive(NAV.x, NAV.y)][1];
+		renderingEnvironment.camera.position.z = NAV.z+200 ; // +vehicle.speed.length()*2
 		console.log(vehicle.speed.z) ;
 //		renderingEnvironment.camera.rotation.z = vehicle.angles.z-Math.PI/2.0 ;
 		// Rendering
