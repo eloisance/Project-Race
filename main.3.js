@@ -17,6 +17,7 @@ requirejs(['ModulesLoaderV2.js'], function()
 		}
 ) ;
 
+
 function start()
 {
 	//	----------------------------------------------------------------------------
@@ -29,12 +30,11 @@ function start()
 	//	----------------------------------------------------------------------------
 	//	keyPressed
 	var currentlyPressedKeys = {};
-	
 	// car Position
 	var CARx = -220; 
-	var CARy = 0 ; 
-	var CARz = 0 ;
-	var CARtheta = 0 ; 
+	var CARy = 0;
+	var CARz = 0;
+	var CARtheta = 0;
 
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle(
@@ -176,15 +176,25 @@ function start()
 		renderingEnvironment.onWindowResize(window.innerWidth,window.innerHeight);
 	}
 
+    //          y
+    //          |
+    // x -------|---------
+    //          |
+    //          |
+
+    // pos X, pos Y, rotation Y
     var items = [
-        [-220, 0],   // P1
-        [-220, 220], // P2
-        [-220, 220], // P3
-        [-220, 220], // P4
-        [-220, 220], // P5
-        [5, 225],    // P6
-        [5, 225],    // P7
-        [5, 225],    // P8
+        [-220, -40, 0],   // P1
+
+        [-260, 280, 220], // P2
+        [-260, 280, 220], // P3
+        [-260, 280, 220], // P4
+        [-260, 280, 220], // P5
+
+        [65, 285, 140],    // P6
+        [65, 245, 140],    // P7
+
+        [5, 225],    // P8 : TODO
         [50, 90],    // P9
         [50, 90],    // P10
         [160, 50],   // P11
@@ -209,7 +219,8 @@ function start()
         [-171, -230] // P30
     ];
 
-	function render() { 
+
+    function render() {
 		requestAnimationFrame( render );
 		handleKeys();
 
@@ -233,15 +244,24 @@ function start()
 		carFloorSlope.matrixAutoUpdate = false;		
 		carFloorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
 		// Updates carRotationZ
-		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0 ;
-		// Camera
+		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
+        // console.log(vehicle.speed.z) ;
+
 		console.log('x: ' + NAV.x);
 		console.log('y: ' + NAV.y);
-		renderingEnvironment.camera.position.x = items[NAV.findActive(NAV.x, NAV.y)][0];
-		renderingEnvironment.camera.position.y = items[NAV.findActive(NAV.x, NAV.y)][1];
-		renderingEnvironment.camera.position.z = NAV.z+200 ; // +vehicle.speed.length()*2
-		console.log(vehicle.speed.z) ;
-//		renderingEnvironment.camera.rotation.z = vehicle.angles.z-Math.PI/2.0 ;
+		console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
+		var currentPlane = NAV.findActive(NAV.x, NAV.y);
+
+        // Camera position
+		renderingEnvironment.camera.position.x = items[currentPlane][0];
+		renderingEnvironment.camera.position.y = items[currentPlane][1];
+		renderingEnvironment.camera.position.z = NAV.z+40; // +vehicle.speed.length()*2
+
+		// Camera rotation
+		renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0;
+		renderingEnvironment.camera.rotation.y = items[currentPlane][2]*3.14159/180.0;
+        // renderingEnvironment.camera.rotation.z = vehicle.angles.z-Math.PI/2.0;
+
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera); 
 	};
