@@ -35,6 +35,8 @@ function start()
 	var CARy = 0;
 	var CARz = 0;
 	var CARtheta = 0;
+	// camera mode
+	var embeddedCamera = true;
 
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle(
@@ -141,8 +143,17 @@ function start()
 
 	//	callback functions
 	//	---------------------------------------------------------------------------
-	function handleKeyDown(event) { currentlyPressedKeys[event.keyCode] = true;}
-	function handleKeyUp(event) {currentlyPressedKeys[event.keyCode] = false;}
+	function handleKeyDown(event) {
+		currentlyPressedKeys[event.keyCode] = true;
+        // (P) Change camera mode
+        if (event.keyCode === 80) {
+            changeCameraMode();
+        }
+	}
+
+	function handleKeyUp(event) {
+		currentlyPressedKeys[event.keyCode] = false;
+	}
 
 	function handleKeys() {
 		if (currentlyPressedKeys[67]) // (C) debug
@@ -168,6 +179,14 @@ function start()
 		{
 			vehicle.brake(100) ;
 		}
+	}
+
+    /**
+	 * Change camera mode !
+     */
+	function changeCameraMode() {
+		embeddedCamera = !embeddedCamera;
+		console.log('camera mode: ' + (embeddedCamera ? 'embedded' : 'fixed'));
 	}
 
 	//	window resize
@@ -247,9 +266,9 @@ function start()
 		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
-		console.log('x: ' + NAV.x);
-		console.log('y: ' + NAV.y);
-		console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
+		//console.log('x: ' + NAV.x);
+		//console.log('y: ' + NAV.y);
+		//console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
 		var currentPlane = NAV.findActive(NAV.x, NAV.y);
 
         // Camera position
