@@ -266,22 +266,33 @@ function start()
 		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
-		//console.log('x: ' + NAV.x);
-		//console.log('y: ' + NAV.y);
-		//console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
+		// console.log('x: ' + NAV.x);
+		// console.log('y: ' + NAV.y);
+		// console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
 		var currentPlane = NAV.findActive(NAV.x, NAV.y);
 
-        // Camera position
-		renderingEnvironment.camera.position.x = items[currentPlane][0];
-		renderingEnvironment.camera.position.y = items[currentPlane][1];
-		renderingEnvironment.camera.position.z = NAV.z + 40; // +vehicle.speed.length()*2
+		if (embeddedCamera) {
+			carGeometry.add(renderingEnvironment.camera);
+			renderingEnvironment.camera.position.x = 0.0;
+			renderingEnvironment.camera.position.z = 10.0;
+			renderingEnvironment.camera.position.y = -25.0;
+			renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0;
+			renderingEnvironment.camera.rotation.y = 0;
+			renderingEnvironment.camera.rotation.z = 0;
+		} else {
+			carGeometry.remove(renderingEnvironment.camera);
+            // Camera position
+            renderingEnvironment.camera.position.x = items[currentPlane][0];
+            renderingEnvironment.camera.position.y = items[currentPlane][1];
+            renderingEnvironment.camera.position.z = NAV.z + 40; // +vehicle.speed.length()*2
 
-		// Camera rotation
-		renderingEnvironment.camera.up = new THREE.Vector3(0,0,1);
-		renderingEnvironment.camera.lookAt( NAV );
-		//renderingEnvironment.camera.rotation.x = 1;
-		// renderingEnvironment.camera.rotation.y = NAV.y*3.14159/180.0;
-        //  renderingEnvironment.camera.rotation.z = Math.PI*2;
+            // Camera rotation
+            renderingEnvironment.camera.up = new THREE.Vector3(0,0,1);
+            renderingEnvironment.camera.lookAt( NAV );
+            //renderingEnvironment.camera.rotation.x = 1;
+            // renderingEnvironment.camera.rotation.y = NAV.y*3.14159/180.0;
+            // renderingEnvironment.camera.rotation.z = Math.PI*2;
+		}
 
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
