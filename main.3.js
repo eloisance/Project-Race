@@ -17,6 +17,9 @@ requirejs(['ModulesLoaderV2.js'], function()
 		}
 );
 
+var laps;
+var lastPlaneCheck;
+
 var speedChart;
 var speedChartData;
 var speedChartOptions = {
@@ -66,7 +69,8 @@ function start()
 	// init chart speed
     initSpeedometerChart();
 
-
+    // init laps
+	initLaps();
 
 	//	Meshes
 	Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
@@ -341,14 +345,19 @@ function initSpeedometerChart() {
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-
         speedChart = new google.visualization.Gauge(document.getElementById('chart_speed'));
-
         speedChartData = google.visualization.arrayToDataTable([
             ['Label', 'Value'],
             ['Speed', 0]
         ]);
-
         speedChart.draw(speedChartData, speedChartOptions);
     }
+}
+
+/**
+ * Init laps
+ */
+function initLaps() {
+	laps = 1;
+	document.getElementsByClassName("laps")[0].innerHTML = "1 / 3";
 }
