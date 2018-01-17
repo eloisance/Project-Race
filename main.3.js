@@ -249,6 +249,7 @@ function start()
     ];
 
 
+
     function render() {
 		requestAnimationFrame( render );
 		handleKeys();
@@ -306,6 +307,16 @@ function start()
 
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
+
+        var old_position = [NAV.x, NAV.y];
+        var current_position = [NAV.x, NAV.y];
+        console.log("old_pos" + old_position)
+        setInterval(function(){
+            var x_vector_dep = current_position.get(0) - old_position.get(0);
+            var y_vector_dep = current_position.get(1) - old_position.get(1);
+            var norm = math.sqrt(math.pow(x_vector_dep, 2) + math.pow(y_vector_dep, 2));
+            
+        }, 1000);
 	};
 
 	render();
