@@ -17,20 +17,24 @@ requirejs(['ModulesLoaderV2.js'], function()
 		}
 );
 
+// camera mode
+var embeddedCamera = true;
+
+// laps
 var laps;
 var lastPlaneCheck;
 
+// Speedometer
 var speedChart;
 var speedChartData;
 var speedChartOptions = {
     width: 400, height: 120,
-    redFrom: 150, redTo: 200,
-    yellowFrom:120, yellowTo: 150,
-    minorTicks: 5, max: 200
+    yellowFrom: 120, yellowTo: 160,
+    redFrom: 160, redTo: 180,
+    minorTicks: 5, max: 180
 };
 
-function start()
-{
+function start() {
 	//	----------------------------------------------------------------------------
 	//	MAR 2014 - nav test
 	//	author(s) : Cozot, R. and Lamarche, F.
@@ -46,24 +50,20 @@ function start()
 	var CARy = 0;
 	var CARz = 0;
 	var CARtheta = 0;
-	// camera mode
-	var embeddedCamera = true;
 
 	// Creates the vehicle (handled by physics)
-	var vehicle = new FlyingVehicle(
-			{
-				position: new THREE.Vector3(CARx, CARy, CARz),
-				zAngle : CARtheta+Math.PI/2.0,
-			}
-			) ;
+	var vehicle = new FlyingVehicle({
+		position: new THREE.Vector3(CARx, CARy, CARz),
+		zAngle : CARtheta+Math.PI/2.0
+	});
 
-	//	rendering env
+	// Rendering env
 	var renderingEnvironment =  new ThreeRenderingEnv();
 
-	//	lighting env
+	// Lighting env
 	var Lights = new ThreeLightingEnv('rembrandt','neutral','spot',renderingEnvironment,5000);
 
-	//	Loading env
+	// Loading env
 	var Loader = new ThreeLoadingEnv();
 
 	// init chart speed
@@ -72,14 +72,14 @@ function start()
     // init laps
 	initLaps();
 
-	//	Meshes
+	//Meshes
 	Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
 	Loader.loadMesh('assets','ground_Zup_03','obj',	renderingEnvironment.scene,'ground',	-340,-340,0,'front');
 	Loader.loadMesh('assets','circuit_Zup_02','obj',renderingEnvironment.scene,'circuit',	-340,-340,0,'front');
 	//Loader.loadMesh('assets','tree_Zup_02','obj',	renderingEnvironment.scene,'trees',	-340,-340,0,'double');
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
-	//	Car
+	// Car
 	// car Translation
 	var carPosition = new THREE.Object3D();
 	carPosition.name = 'car0';
@@ -166,6 +166,10 @@ function start()
         if (event.keyCode === 80) {
             changeCameraMode();
         }
+        // (<--) Backspace - reset game
+		if (event.keyCode === 8) {
+        	resetGame();
+		}
 	}
 
 	function handleKeyUp(event) {
@@ -173,27 +177,21 @@ function start()
 	}
 
 	function handleKeys() {
-		if (currentlyPressedKeys[67]) // (C) debug
-		{
-			// debug scene
+		if (currentlyPressedKeys[67]) { // (C) debug scene
 			renderingEnvironment.scene.traverse(function(o){
 				console.log('object:'+o.name+'>'+o.id+'::'+o.type);
 			});
 		}
-		if (currentlyPressedKeys[68]) // (D) Right
-		{
+		if (currentlyPressedKeys[68]) { // (D) Right
 			vehicle.turnRight(1000) ;
 		}
-		if (currentlyPressedKeys[81]) // (Q) Left
-		{
+		if (currentlyPressedKeys[81]) { // (Q) Left
 			vehicle.turnLeft(1000) ;
 		}
-		if (currentlyPressedKeys[90]) // (Z) Up
-		{
+		if (currentlyPressedKeys[90]) { // (Z) Up
 			vehicle.goFront(1200, 1200) ;
 		}
-		if (currentlyPressedKeys[83]) // (S) Down
-		{
+		if (currentlyPressedKeys[83]) { // (S) Down
 			vehicle.brake(100) ;
 		}
 	}
@@ -207,8 +205,7 @@ function start()
 	}
 
 	//	window resize
-	function  onWindowResize()
-	{
+	function  onWindowResize() {
 		renderingEnvironment.onWindowResize(window.innerWidth,window.innerHeight);
 	}
 
@@ -307,7 +304,7 @@ function start()
             // Camera rotation
             renderingEnvironment.camera.up = new THREE.Vector3(0,0,1);
             renderingEnvironment.camera.lookAt( NAV );
-            //renderingEnvironment.camera.rotation.x = 1;
+            // renderingEnvironment.camera.rotation.x = 1;
             // renderingEnvironment.camera.rotation.y = NAV.y*3.14159/180.0;
             // renderingEnvironment.camera.rotation.z = Math.PI*2;
 		}
@@ -360,4 +357,15 @@ function initSpeedometerChart() {
 function initLaps() {
 	laps = 1;
 	document.getElementsByClassName("laps")[0].innerHTML = "1 / 3";
+}
+
+function resetGame() {
+	console.log('resetGame');
+	
+	// reset camera
+    embeddedCamera = true;
+
+    // reset position vehicle
+
+	// reset camera position
 }
