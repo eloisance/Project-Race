@@ -38,8 +38,6 @@ function start()
 	// camera mode
 	var embeddedCamera = true;
 
-    updateSpeedometer(44);
-
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle(
 			{
@@ -307,18 +305,21 @@ function start()
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
 
-        var old_position = [NAV.x, NAV.y];
-        var current_position = [NAV.x, NAV.y];
+
         //console.log("old_pos" + old_position)
-        setInterval(function(){
-            var x_vector_dep = current_position[0] - old_position[0];
-            var y_vector_dep = current_position[1] - old_position[1];
-            var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
-            updateSpeedometer(Math.round(norm));
-            old_position = current_position;
-            current_position = [NAV.x, NAV.y]
-        }, 1000);
 	};
+
+    var old_position = [NAV.x, NAV.y];
+    var current_position = [NAV.x, NAV.y];
+    var time = 500; // ms
+    setInterval(function(){
+        var x_vector_dep = current_position[0] - old_position[0];
+        var y_vector_dep = current_position[1] - old_position[1];
+        var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
+        updateSpeedometer(Math.round(norm/(time/1000)));
+        old_position = current_position;
+        current_position = [NAV.x, NAV.y]
+    }, time);
 
 	render();
 }
