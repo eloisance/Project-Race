@@ -38,6 +38,9 @@ function start()
 	// camera mode
 	var embeddedCamera = true;
 
+    setInterval(function(){ console.log("tic"); }, 1000);
+    updateSpeedometer(44);
+
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle(
 			{
@@ -187,6 +190,13 @@ function start()
 	function changeCameraMode() {
 		embeddedCamera = !embeddedCamera;
 		console.log('camera mode: ' + (embeddedCamera ? 'embedded' : 'fixed'));
+	}
+
+    /**
+	 * Update speedometer !
+     */
+	function updateSpeedometer(speed) {
+        document.getElementsByClassName("speedometer")[0].innerHTML = speed + " km/h";
 	}
 
 	//	window resize
