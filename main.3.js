@@ -15,8 +15,16 @@ requirejs(['ModulesLoaderV2.js'], function()
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
-) ;
+);
 
+var speedChart;
+var speedChartData;
+var speedChartOptions = {
+    width: 400, height: 120,
+    redFrom: 150, redTo: 200,
+    yellowFrom:120, yellowTo: 150,
+    minorTicks: 5, max: 200
+};
 
 function start()
 {
@@ -54,6 +62,11 @@ function start()
 
 	//	Loading env
 	var Loader = new ThreeLoadingEnv();
+
+	// init chart speed
+    initSpeedometerChart();
+
+
 
 	//	Meshes
 	Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
@@ -189,13 +202,6 @@ function start()
 		console.log('camera mode: ' + (embeddedCamera ? 'embedded' : 'fixed'));
 	}
 
-    /**
-	 * Update speedometer !
-     */
-	function updateSpeedometer(speed) {
-        document.getElementsByClassName("speedometer")[0].innerHTML = speed + " km/h";
-	}
-
 	//	window resize
 	function  onWindowResize()
 	{
@@ -247,7 +253,7 @@ function start()
 
 
 
-    function render() {
+    function render(chart, data) {
 		requestAnimationFrame( render );
 		handleKeys();
 
@@ -316,10 +322,33 @@ function start()
         var x_vector_dep = current_position[0] - old_position[0];
         var y_vector_dep = current_position[1] - old_position[1];
         var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
-        updateSpeedometer(Math.round(norm/(time/1000)));
+		// Update speedometer
+        speedChartData.setValue(0, 1, Math.round(norm/(time/1000)));
+        speedChart.draw(speedChartData, speedChartOptions);
+		// Update position
         old_position = current_position;
         current_position = [NAV.x, NAV.y]
     }, time);
 
 	render();
+}
+
+/**
+ * Init Google chart for speedometer
+ */
+function initSpeedometerChart() {
+    google.charts.load('current', {'packages':['gauge']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+        speedChart = new google.visualization.Gauge(document.getElementById('chart_speed'));
+
+        speedChartData = google.visualization.arrayToDataTable([
+            ['Label', 'Value'],
+            ['Speed', 0]
+        ]);
+
+        speedChart.draw(speedChartData, speedChartOptions);
+    }
 }
