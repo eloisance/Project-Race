@@ -311,10 +311,10 @@ function start()
         var current_position = [NAV.x, NAV.y];
         //console.log("old_pos" + old_position)
         setInterval(function(){
-            var x_vector_dep = current_position.get(0) - old_position.get(0);
-            var y_vector_dep = current_position.get(1) - old_position.get(1);
-            var norm = math.sqrt(math.pow(x_vector_dep, 2) + math.pow(y_vector_dep, 2));
-            updateSpeedometer(norm/3600);
+            var x_vector_dep = current_position[0] - old_position[0];
+            var y_vector_dep = current_position[1] - old_position[1];
+            var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
+            updateSpeedometer(Math.round(norm));
             old_position = current_position;
             current_position = [NAV.x, NAV.y]
         }, 1000);
