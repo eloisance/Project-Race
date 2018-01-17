@@ -38,7 +38,6 @@ function start()
 	// camera mode
 	var embeddedCamera = true;
 
-    setInterval(function(){ console.log("tic"); }, 1000);
     updateSpeedometer(44);
 
 	// Creates the vehicle (handled by physics)
@@ -310,12 +309,14 @@ function start()
 
         var old_position = [NAV.x, NAV.y];
         var current_position = [NAV.x, NAV.y];
-        console.log("old_pos" + old_position)
+        //console.log("old_pos" + old_position)
         setInterval(function(){
             var x_vector_dep = current_position.get(0) - old_position.get(0);
             var y_vector_dep = current_position.get(1) - old_position.get(1);
             var norm = math.sqrt(math.pow(x_vector_dep, 2) + math.pow(y_vector_dep, 2));
-            
+            updateSpeedometer(norm/3600);
+            old_position = current_position;
+            current_position = [NAV.x, NAV.y]
         }, 1000);
 	};
 
