@@ -215,19 +215,16 @@ function start() {
     //          |
     //          |
 
-    // pos X, pos Y, rotation Y
+    // camera position X, camera position Y
     var items = [
-        [-220, -40, 0],   // P1
-
-        [-260, 280, 220], // P2
-        [-260, 280, 220], // P3
-        [-260, 280, 220], // P4
-        [-260, 280, 220], // P5
-
-        [65, 285, 140],    // P6
-        [65, 245, 140],    // P7
-
-        [5, 225],    // P8 : TODO
+        [-220, -40],  // P1
+        [-260, 280], // P2
+        [-260, 280], // P3
+        [-260, 280], // P4
+        [-260, 280], // P5
+        [65, 285],   // P6
+        [65, 245],   // P7
+        [5, 225],    // P8
         [50, 90],    // P9
         [50, 90],    // P10
         [160, 50],   // P11
@@ -361,7 +358,7 @@ function initLaps() {
 
 function resetGame() {
 	console.log('resetGame');
-	
+
 	// reset camera
     embeddedCamera = true;
 
