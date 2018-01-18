@@ -1,0 +1,6 @@
+- [x] saut (augmentation de z) lorsque appui d'une touche (espace) 
+- [ ] obstacles
+- [ ] compteur de tours (check points dans l'ordre)
+- [ ] timeur de tours
+- [ ] fumee pot d'echappement
+

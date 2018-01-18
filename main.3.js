@@ -100,7 +100,7 @@ function start() {
 	// the car itself
 	// simple method to load an object
 	var carGeometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: carRotationZ, name: 'car3'}) ;
-	carGeometry.position.z= +0.25 ;
+	carGeometry.position.z= + 2 ;
 	// attach the scene camera to car
 //	carGeometry.add(renderingEnvironment.camera) ;
 //	renderingEnvironment.camera.position.x = 0.0 ;
@@ -170,6 +170,11 @@ function start() {
 		if (event.keyCode === 8) {
         	resetGame();
 		}
+		// (Space) for Jumping
+		if (event.keyCode === 32) {
+        	jump();
+		}
+		// (Esc) for returning to the menu --> 27
 	}
 
 	function handleKeyUp(event) {
@@ -203,6 +208,14 @@ function start() {
 		embeddedCamera = !embeddedCamera;
 		console.log('camera mode: ' + (embeddedCamera ? 'embedded' : 'fixed'));
 	}
+
+	function jump() {
+        console.log("Jumping");
+        console.log("carGeometry.position.z: " + carGeometry.position.z);
+        carGeometry.position.z += 10;
+        setTimeout(function(){ carGeometry.position.z -= 10; }, 1000); //1 seconde d'attente
+
+    }
 
 	//	window resize
 	function  onWindowResize() {
