@@ -6,12 +6,14 @@
 requirejs(['ModulesLoaderV2.js'], function()
 		{
 			// Level 0 includes
+			// ModulesLoader.requireModules(["lib/dat.gui.js"]) ;
 			ModulesLoader.requireModules(["threejs/three.min.js"]) ;
-			ModulesLoader.requireModules([ "myJS/ThreeRenderingEnv.js",
+			ModulesLoader.requireModules(["myJS/ThreeRenderingEnv.js",
 			                              "myJS/ThreeLightingEnv.js",
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js"]) ;
+
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -50,7 +52,7 @@ function start() {
 	var CARy = 0;
 	var CARz = 0;
 	var CARtheta = 0;
-
+	//var gui = new dat.GUI();
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle({
 		position: new THREE.Vector3(CARx, CARy, CARz),
@@ -67,7 +69,7 @@ function start() {
 	var Loader = new ThreeLoadingEnv();
 
 	// init chart speed
-    initSpeedometerChart();
+  initSpeedometerChart();
 
     // init laps
 	initLaps();
@@ -147,9 +149,9 @@ function start() {
 	NAV.setPos(CARx,CARy,CARz);
 	NAV.initActive();
 	// DEBUG
-	//NAV.debug();
-	//var navMesh = NAV.toMesh();
-	//renderingEnvironment.addToScene(navMesh);
+	// NAV.debug();
+	// var navMesh = NAV.toMesh();
+	// renderingEnvironment.addToScene(navMesh);
 	//	event listener
 	//	---------------------------------------------------------------------------
 	//	resize window
@@ -325,7 +327,23 @@ function start() {
 
         //console.log("old_pos" + old_position)
 	};
+	function resetGame() {
+		console.log('resetGame');
+		// reset position vehicle
+		vehicle.angles.z = Math.PI/2;
+		NAV.setPos(-220,0,0);
+		NAV.initActive();
+		vehicle.speed = new THREE.Vector3(0.0,0.0,0.0);
 
+		// reset camera position
+	  embeddedCamera = true;
+
+		// reset tour
+
+
+
+
+	}
     var old_position = [NAV.x, NAV.y];
     var current_position = [NAV.x, NAV.y];
     var time = 500; // ms
@@ -367,15 +385,4 @@ function initSpeedometerChart() {
 function initLaps() {
 	laps = 1;
 	document.getElementsByClassName("laps")[0].innerHTML = "1 / 3";
-}
-
-function resetGame() {
-	console.log('resetGame');
-
-	// reset camera
-    embeddedCamera = true;
-
-    // reset position vehicle
-
-	// reset camera position
 }
