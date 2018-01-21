@@ -25,3 +25,34 @@ canvas {
     font-weight: bold;
     display:block;
 }
+
+.warning {
+    display: none;
+    z-index: 200;
+    position: absolute;
+    top: 200px;
+    text-align: center;
+    width: 100%;
+    background: black;
+    color: red;
+    font-weight: bold;
+    font-size: 30px;
+    padding: 20px 0;
+    opacity: 0.5;
+}
+
+
+.finish {
+    display: none;
+    z-index: 200;
+    position: absolute;
+    top: 200px;
+    text-align: center;
+    width: 100%;
+    background: black;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    padding: 20px 0;
+    opacity: 0.5;
+}

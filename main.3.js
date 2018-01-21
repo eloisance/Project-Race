@@ -22,9 +22,19 @@ requirejs(['ModulesLoaderV2.js'], function()
 // camera mode
 var embeddedCamera = true;
 
+
 // laps
 var laps;
-var lastPlaneCheck;
+var maxLaps = 3;
+var lastPlaneCheck = 0;
+var raceEnd = false;
+
+// Array of minimum plane to check to validate lap
+var planeCheckpoints = [0, 1, 5, 10, 14, 21, 29];
+
+// Array of all plane check for this lap
+var currentPlaneCheckpointsLap = [];
+
 
 // Speedometer
 var speedChart;
@@ -232,7 +242,7 @@ function start() {
 
     // camera position X, camera position Y
     var items = [
-        [-220, -40],  // P1
+        [-220, -40], // P1
         [-260, 280], // P2
         [-260, 280], // P3
         [-260, 280], // P4
@@ -296,7 +306,30 @@ function start() {
 		// console.log('x: ' + NAV.x);
 		// console.log('y: ' + NAV.y);
 		// console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
-		var currentPlane = NAV.findActive(NAV.x, NAV.y);
+		var currentPlane = parseInt(NAV.findActive(NAV.x, NAV.y));
+
+
+        // check laps
+        if (lastPlaneCheck !== currentPlane) {
+        	// Check if lap is done
+        	if (currentPlane === 1 && lastPlaneCheck === 0 && allCheckpointsDone()) { // error can't use ===
+                oneLapDone();
+			}
+			// Check right way
+            if (currentPlane < lastPlaneCheck) {
+        		if (currentPlane === 0 && lastPlaneCheck === 29) {
+        			// do nothing
+        		} else {
+                    document.getElementsByClassName("warning")[0].style.display = 'block';
+				}
+            } else {
+                document.getElementsByClassName("warning")[0].style.display = 'none';
+            }
+            // add this plane to plane checked for this lap
+            currentPlaneCheckpointsLap.push(currentPlane);
+            // set currentPlane as lastPlaneCheck
+            lastPlaneCheck = currentPlane;
+        }
 
 		if (embeddedCamera) {
 			carGeometry.add(renderingEnvironment.camera);
@@ -347,7 +380,7 @@ function start() {
     var old_position = [NAV.x, NAV.y];
     var current_position = [NAV.x, NAV.y];
     var time = 500; // ms
-    setInterval(function(){
+    setInterval(function() {
         var x_vector_dep = current_position[0] - old_position[0];
         var y_vector_dep = current_position[1] - old_position[1];
         var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
@@ -360,6 +393,33 @@ function start() {
     }, time);
 
 	render();
+
+    /**
+	 * Return true if all checkpoints is in currentPlaneCheckpointsLap
+     * @returns {boolean}
+     */
+	function allCheckpointsDone() {
+        return planeCheckpoints.every(function(val) {
+            return currentPlaneCheckpointsLap.indexOf(parseInt(val)) !== -1;
+        });
+	}
+
+    /**
+	 * Call when one lap is done
+     */
+	function oneLapDone() {
+		// reset checkpoints done in previous lap
+        currentPlaneCheckpointsLap = [];
+
+		// Set to end or increment laps
+		if (laps >= maxLaps) {
+			raceEnd = true;
+            document.getElementsByClassName("finish")[0].style.display = 'block';
+		} else {
+            laps += 1;
+            updateLaps(laps);
+		}
+	}
 }
 
 /**
@@ -384,5 +444,9 @@ function initSpeedometerChart() {
  */
 function initLaps() {
 	laps = 1;
-	document.getElementsByClassName("laps")[0].innerHTML = "1 / 3";
+	updateLaps(laps);
+}
+
+function updateLaps(newLapsValue) {
+    document.getElementsByClassName("laps")[0].innerHTML = newLapsValue + " / " + maxLaps;
 }
