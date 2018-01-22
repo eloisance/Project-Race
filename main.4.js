@@ -28,18 +28,6 @@ function start()
 	//	keyPressed
 	var currentlyPressedKeys = {};
 
-    // // helico Position ?
-    // var CARx = -220;
-    // var CARy = 0;
-    // var CARz = 0;
-    // var CARtheta = 0;
-    //
-    // // Creates the vehicle (handled by physics)
-    // var vehicle = new FlyingVehicle({
-    //     position: new THREE.Vector3(CARx, CARy, CARz),
-    //     zAngle : CARtheta+Math.PI/2.0
-    // });
-
 
 	//	rendering env
 	var renderingEnvironment =  new ThreeRenderingEnv();
@@ -54,7 +42,8 @@ function start()
 	renderingEnvironment.camera.position.x = 0 ;
 	renderingEnvironment.camera.position.y = 0 ;
 	renderingEnvironment.camera.position.z = 40 ;
-	
+
+
 	//	event listener
 	//	---------------------------------------------------------------------------
 	//	resize window
