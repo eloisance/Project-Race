@@ -367,9 +367,9 @@ function start() {
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
 
-
         //console.log("old_pos" + old_position)
 	};
+
 	function resetGame() {
 		console.log('resetGame');
 		// reset position vehicle
@@ -381,14 +381,19 @@ function start() {
 
 
 		// reset camera position
-	  embeddedCamera = true;
+	  	embeddedCamera = true;
 
 		// reset tour
+		initLaps();
+        currentPlaneCheckpointsLap = [];
+        lastPlaneCheck = 0;
+        hideRaceEnd();
 
-
-
-
+		// reset speed
+        speedChartData.setValue(0, 1, 0);
+        speedChart.draw(speedChartData, speedChartOptions);
 	}
+
     var old_position = [NAV.x, NAV.y];
     var current_position = [NAV.x, NAV.y];
     var time = 500; // ms
@@ -421,18 +426,18 @@ function start() {
      */
 	function oneLapDone() {
 		// reset checkpoints done in previous lap
-        currentPlaneCheckpointsLap = [];
+    currentPlaneCheckpointsLap = [];
 		laps += 1;
 		// Set to end or increment laps
-		if (laps === maxLaps) {
-				raceEnd = true;
-        document.getElementsByClassName("finish")[0].style.display = 'block';
-				updateTimerLaps(clock.getElapsedTime(),laps);
-				updateLaps(laps);
-		} else if(laps < maxLaps) {
-				updateTimerLaps(clock.getElapsedTime(),laps);
 
-				updateLaps(laps);
+		if (laps === maxLaps) {
+			showRaceEnd();
+			updateTimerLaps(clock.getElapsedTime(),laps);
+			updateLaps(laps);
+		} else if(laps < maxLaps){
+
+						updateTimerLaps(clock.getElapsedTime(),laps);
+            updateLaps(laps);
 		}
 	}
 }
@@ -462,8 +467,27 @@ function initLaps() {
 	updateLaps(laps);
 }
 
+/**
+ *
+ * @param newLapsValue
+ */
 function updateLaps(newLapsValue) {
     document.getElementsByClassName("laps")[0].innerHTML = newLapsValue + " / " + maxLaps;
+}
+/**
+ * Show div for race end
+ */
+function showRaceEnd() {
+	raceEnd = true;
+    document.getElementsByClassName("finish")[0].style.display = 'block';
+}
+
+/**
+ * Hide div for race end
+ */
+function hideRaceEnd() {
+	raceEnd = false;
+    document.getElementsByClassName("finish")[0].style.display = 'none';
 }
 
 function updateTimer(time) {
