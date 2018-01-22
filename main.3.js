@@ -29,6 +29,7 @@ var maxLaps = 3;
 var lastPlaneCheck = 0;
 var raceEnd = false;
 
+var clock;
 // Array of minimum plane to check to validate lap
 var planeCheckpoints = [0, 1, 5, 10, 14, 21, 29];
 
@@ -56,12 +57,15 @@ function start() {
 	//	global vars
 	//	----------------------------------------------------------------------------
 	//	keyPressed
+
+	document.getElementsByClassName("time")[0].style.display = 'block';
 	var currentlyPressedKeys = {};
 	// car Position
 	var CARx = -220;
 	var CARy = 0;
 	var CARz = 0;
 	var CARtheta = 0;
+
 	//var gui = new dat.GUI();
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle({
@@ -81,8 +85,11 @@ function start() {
 	// init chart speed
   initSpeedometerChart();
 
-    // init laps
+  // init laps
 	initLaps();
+
+	// initTimerLaps
+	initTimerLaps();
 
 	//Meshes
 	Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
@@ -303,6 +310,9 @@ function start() {
 		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
+		if (!raceEnd){
+	  	updateTimer(clock.getElapsedTime());
+		}
 		// console.log('x: ' + NAV.x);
 		// console.log('y: ' + NAV.y);
 		// console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
@@ -365,8 +375,10 @@ function start() {
 		// reset position vehicle
 		vehicle.angles.z = Math.PI/2;
 		NAV.setPos(-220,0,0);
+
 		NAV.initActive();
 		vehicle.speed = new THREE.Vector3(0.0,0.0,0.0);
+
 
 		// reset camera position
 	  embeddedCamera = true;
@@ -410,14 +422,17 @@ function start() {
 	function oneLapDone() {
 		// reset checkpoints done in previous lap
         currentPlaneCheckpointsLap = [];
-
+		laps += 1;
 		// Set to end or increment laps
-		if (laps >= maxLaps) {
-			raceEnd = true;
-            document.getElementsByClassName("finish")[0].style.display = 'block';
-		} else {
-            laps += 1;
-            updateLaps(laps);
+		if (laps === maxLaps) {
+				raceEnd = true;
+        document.getElementsByClassName("finish")[0].style.display = 'block';
+				updateTimerLaps(clock.getElapsedTime(),laps);
+				updateLaps(laps);
+		} else if(laps < maxLaps) {
+				updateTimerLaps(clock.getElapsedTime(),laps);
+
+				updateLaps(laps);
 		}
 	}
 }
@@ -449,4 +464,29 @@ function initLaps() {
 
 function updateLaps(newLapsValue) {
     document.getElementsByClassName("laps")[0].innerHTML = newLapsValue + " / " + maxLaps;
+}
+
+function updateTimer(time) {
+
+    document.getElementsByClassName("time")[0].innerHTML = time.toFixed(2) ;
+}
+
+function updateTimerLaps(time,laps) {
+	document.getElementsByClassName("timelaps"+laps)[0].style.display = 'block';
+	document.getElementsByClassName("timelaps"+laps)[0].innerHTML = "Tour "+laps + " : "+time.toFixed(2);
+
+	if(laps<3){
+		clock.start();
+	}else{
+		document.getElementsByClassName("time")[0].innerHTML = "0.00" ;
+	}
+
+}
+
+function initTimerLaps(){
+	  clock = new THREE.Clock
+		clock.start();
+		document.getElementsByClassName("timelaps1")[0].style.display = 'none';
+		document.getElementsByClassName("timelaps2")[0].style.display = 'none';
+		document.getElementsByClassName("timelaps3")[0].style.display = 'none';
 }
