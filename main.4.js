@@ -43,6 +43,12 @@ function start()
 	renderingEnvironment.camera.position.y = 0 ;
 	renderingEnvironment.camera.position.z = 40 ;
 
+	// Helico
+
+    Loader.load()
+    ('assets/helico/pale.obj',function ( object ) {renderingEnvironment.addToScene( object );});
+
+
 
 	//	event listener
 	//	---------------------------------------------------------------------------
