@@ -6,12 +6,14 @@
 requirejs(['ModulesLoaderV2.js'], function()
 		{
 			// Level 0 includes
+			// ModulesLoader.requireModules(["lib/dat.gui.js"]) ;
 			ModulesLoader.requireModules(["threejs/three.min.js"]) ;
-			ModulesLoader.requireModules([ "myJS/ThreeRenderingEnv.js",
+			ModulesLoader.requireModules(["myJS/ThreeRenderingEnv.js",
 			                              "myJS/ThreeLightingEnv.js",
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js"]) ;
+
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -20,9 +22,20 @@ requirejs(['ModulesLoaderV2.js'], function()
 // camera mode
 var embeddedCamera = true;
 
+
 // laps
 var laps;
-var lastPlaneCheck;
+var maxLaps = 3;
+var lastPlaneCheck = 0;
+var raceEnd = false;
+
+var clock;
+// Array of minimum plane to check to validate lap
+var planeCheckpoints = [0, 1, 5, 10, 14, 21, 29];
+
+// Array of all plane check for this lap
+var currentPlaneCheckpointsLap = [];
+
 
 // Speedometer
 var speedChart;
@@ -44,6 +57,8 @@ function start() {
 	//	global vars
 	//	----------------------------------------------------------------------------
 	//	keyPressed
+
+	document.getElementsByClassName("time")[0].style.display = 'block';
 	var currentlyPressedKeys = {};
 	// car Position
 	var CARx = -220;
@@ -51,6 +66,7 @@ function start() {
 	var CARz = 0;
 	var CARtheta = 0;
 
+	//var gui = new dat.GUI();
 	// Creates the vehicle (handled by physics)
 	var vehicle = new FlyingVehicle({
 		position: new THREE.Vector3(CARx, CARy, CARz),
@@ -67,10 +83,13 @@ function start() {
 	var Loader = new ThreeLoadingEnv();
 
 	// init chart speed
-    initSpeedometerChart();
+  initSpeedometerChart();
 
-    // init laps
+  // init laps
 	initLaps();
+
+	// initTimerLaps
+	initTimerLaps();
 
 	//Meshes
 	Loader.loadMesh('assets','border_Zup_02','obj',	renderingEnvironment.scene,'border',	-340,-340,0,'front');
@@ -147,9 +166,9 @@ function start() {
 	NAV.setPos(CARx,CARy,CARz);
 	NAV.initActive();
 	// DEBUG
-	//NAV.debug();
-	//var navMesh = NAV.toMesh();
-	//renderingEnvironment.addToScene(navMesh);
+	// NAV.debug();
+	// var navMesh = NAV.toMesh();
+	// renderingEnvironment.addToScene(navMesh);
 	//	event listener
 	//	---------------------------------------------------------------------------
 	//	resize window
@@ -230,7 +249,7 @@ function start() {
 
     // camera position X, camera position Y
     var items = [
-        [-220, -40],  // P1
+        [-220, -40], // P1
         [-260, 280], // P2
         [-260, 280], // P3
         [-260, 280], // P4
@@ -291,10 +310,36 @@ function start() {
 		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
+		if (!raceEnd){
+	  	updateTimer(clock.getElapsedTime());
+		}
 		// console.log('x: ' + NAV.x);
 		// console.log('y: ' + NAV.y);
 		// console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
-		var currentPlane = NAV.findActive(NAV.x, NAV.y);
+		var currentPlane = parseInt(NAV.findActive(NAV.x, NAV.y));
+
+
+        // check laps
+        if (lastPlaneCheck !== currentPlane) {
+        	// Check if lap is done
+        	if (currentPlane === 1 && lastPlaneCheck === 0 && allCheckpointsDone()) { // error can't use ===
+                oneLapDone();
+			}
+			// Check right way
+            if (currentPlane < lastPlaneCheck) {
+        		if (currentPlane === 0 && lastPlaneCheck === 29) {
+        			// do nothing
+        		} else {
+                    document.getElementsByClassName("warning")[0].style.display = 'block';
+				}
+            } else {
+                document.getElementsByClassName("warning")[0].style.display = 'none';
+            }
+            // add this plane to plane checked for this lap
+            currentPlaneCheckpointsLap.push(currentPlane);
+            // set currentPlane as lastPlaneCheck
+            lastPlaneCheck = currentPlane;
+        }
 
 		if (embeddedCamera) {
 			carGeometry.add(renderingEnvironment.camera);
@@ -322,14 +367,40 @@ function start() {
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
 
-
         //console.log("old_pos" + old_position)
 	};
+
+	function resetGame() {
+		console.log('resetGame');
+		// reset position vehicle
+		vehicle.angles.z = Math.PI/2;
+		NAV.setPos(-220,0,0);
+
+		NAV.initActive();
+		vehicle.speed = new THREE.Vector3(0.0,0.0,0.0);
+
+
+		// reset camera position
+	  embeddedCamera = true;
+
+		// reset tour
+		initLaps();
+    currentPlaneCheckpointsLap = [];
+    lastPlaneCheck = 0;
+    hideRaceEnd();
+		initTimerLaps();
+
+		// reset speed
+    speedChartData.setValue(0, 1, 0);
+    speedChart.draw(speedChartData, speedChartOptions);
+
+
+	}
 
     var old_position = [NAV.x, NAV.y];
     var current_position = [NAV.x, NAV.y];
     var time = 500; // ms
-    setInterval(function(){
+    setInterval(function() {
         var x_vector_dep = current_position[0] - old_position[0];
         var y_vector_dep = current_position[1] - old_position[1];
         var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
@@ -342,6 +413,38 @@ function start() {
     }, time);
 
 	render();
+
+    /**
+	 * Return true if all checkpoints is in currentPlaneCheckpointsLap
+     * @returns {boolean}
+     */
+	function allCheckpointsDone() {
+        return planeCheckpoints.every(function(val) {
+            return currentPlaneCheckpointsLap.indexOf(parseInt(val)) !== -1;
+        });
+	}
+
+    /**
+	 * Call when one lap is done
+     */
+	function oneLapDone() {
+		// reset checkpoints done in previous lap
+    currentPlaneCheckpointsLap = [];
+
+		// Set to end or increment laps
+
+		if (laps === maxLaps) {
+			showRaceEnd();
+			updateTimerLaps(clock.getElapsedTime(),laps);
+			updateLaps(laps);
+		} else if(laps < maxLaps){
+
+			updateTimerLaps(clock.getElapsedTime(),laps);
+			laps += 1;
+      updateLaps(laps);
+		}
+
+	}
 }
 
 /**
@@ -366,16 +469,53 @@ function initSpeedometerChart() {
  */
 function initLaps() {
 	laps = 1;
-	document.getElementsByClassName("laps")[0].innerHTML = "1 / 3";
+	updateLaps(laps);
 }
 
-function resetGame() {
-	console.log('resetGame');
+/**
+ *
+ * @param newLapsValue
+ */
+function updateLaps(newLapsValue) {
+    document.getElementsByClassName("laps")[0].innerHTML = newLapsValue + " / " + maxLaps;
+}
+/**
+ * Show div for race end
+ */
+function showRaceEnd() {
+	raceEnd = true;
+    document.getElementsByClassName("finish")[0].style.display = 'block';
+}
 
-	// reset camera
-    embeddedCamera = true;
+/**
+ * Hide div for race end
+ */
+function hideRaceEnd() {
+	raceEnd = false;
+    document.getElementsByClassName("finish")[0].style.display = 'none';
+}
 
-    // reset position vehicle
+function updateTimer(time) {
 
-	// reset camera position
+    document.getElementsByClassName("time")[0].innerHTML = time.toFixed(2) ;
+}
+
+function updateTimerLaps(time,laps) {
+	document.getElementsByClassName("timelaps"+laps)[0].style.display = 'block';
+	document.getElementsByClassName("timelaps"+laps)[0].innerHTML = "Tour "+laps + " : "+time.toFixed(2);
+	clock = new THREE.Clock;
+	if(laps<3){
+		clock.start();
+	}else{
+		document.getElementsByClassName("time")[0].innerHTML = "0.00" ;
+	}
+
+}
+
+function initTimerLaps(){
+	  clock = new THREE.Clock;
+		clock.start();
+		document.getElementsByClassName("timelaps1")[0].style.display = 'none';
+		document.getElementsByClassName("timelaps2")[0].style.display = 'none';
+		document.getElementsByClassName("timelaps3")[0].style.display = 'none';
 }
