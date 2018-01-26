@@ -1,5 +1,5 @@
 /**
- *  ThreeJS test file using the ThreeRender class
+ *  ThreeJS engine file using the ThreeRender class
  */
 
 //Loads all dependencies
@@ -12,6 +12,8 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js"]) ;
+            ModulesLoader.requireModules(["ParticleSystem.js"]) ;
+            ModulesLoader.requireModules(["Interpolators.js", "MathExt.js"]) ;
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -36,7 +38,7 @@ var speedChartOptions = {
 
 function start() {
 	//	----------------------------------------------------------------------------
-	//	MAR 2014 - nav test
+	//	MAR 2014 - nav engine
 	//	author(s) : Cozot, R. and Lamarche, F.
 	//	date : 11/16/2014
 	//	last : 11/25/2014
@@ -79,6 +81,53 @@ function start() {
 	//Loader.loadMesh('assets','tree_Zup_02','obj',	renderingEnvironment.scene,'trees',	-340,-340,0,'double');
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
+    var conf = {
+        textureFile:"assets/particles/particle.png",
+        particlesCount: 10000,
+        blendingMode:THREE.AdditiveBlending
+    };
+
+    var confEmitterD = {
+        cone: {
+            center: new THREE.Vector3(2.5,-8,2),
+            height: new THREE.Vector3(1.5,-5,0.5),
+            radius: 1,
+            flow: 1000,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5 , 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1 , 7),
+        }
+    };
+    var confEmitterG = {
+        cone: {
+            center: new THREE.Vector3(-4.5,-8,2),
+            height: new THREE.Vector3(1.5,-5,0.5),
+            radius: 1,
+            flow: 1000,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5 , 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1 , 7),
+        }
+    };
+    var engine = new ParticleSystem.Engine_Class(conf);
+    var emitL = new ParticleSystem.ConeEmitter_Class(confEmitterD);
+    var emitR = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+    engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+    engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+    engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+    engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
+    engine.addEmitter(emitL);
+    engine.addEmitter(emitR);
+
+
+
 	// Car
 	// car Translation
 	var carPosition = new THREE.Object3D();
@@ -107,7 +156,7 @@ function start() {
 //	renderingEnvironment.camera.position.z = 10.0 ;
 //	renderingEnvironment.camera.position.y = -25.0 ;
 //	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
-
+    carGeometry.add(engine.particleSystem);
 	//	Skybox
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
 
@@ -321,7 +370,7 @@ function start() {
 
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
-
+        engine.animate(0.5, render);
 
         //console.log("old_pos" + old_position)
 	};

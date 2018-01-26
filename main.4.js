@@ -12,6 +12,8 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js", 
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js"]) ;
+            ModulesLoader.requireModules(["ParticleSystem.js"]) ;
+            ModulesLoader.requireModules(["Interpolators.js", "MathExt.js"]) ;
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -21,7 +23,8 @@ function start()
 {
 	//	----------------------------------------------------------------------------
 	//	MAR 2014 - TP Animation hélicoptère
-	//	author(s) : Cozot, R. and Lamarche, F.
+	//	author(s) : Cozot, R. and Lamarche, F. + June Benvegnu-Sallou, Antoine Ferey, Emmanuel Loisance
+    //
 	//	---------------------------------------------------------------------------- 			
 	//	global vars
 	//	----------------------------------------------------------------------------
@@ -44,13 +47,13 @@ function start()
 	renderingEnvironment.camera.position.z = 40 ;
 
 	// Helico
-
-    Loader.load()
-    ('assets/helico/pale.obj',function ( object ) {renderingEnvironment.addToScene( object );});
-
+    // Loader.loadObj('assets/helico/','pale', renderingEnvironment.scene, "pale", 0,0,0, "back");
+    // Loader.loadObj('assets/helico/','axe', renderingEnvironment.scene, "axe", 105,15,15  , "double");
 
 
-	//	event listener
+
+
+    //	event listener
 	//	---------------------------------------------------------------------------
 	//	resize window
 	window.addEventListener( 'resize', onWindowResize, false );
