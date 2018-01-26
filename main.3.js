@@ -381,17 +381,20 @@ function start() {
 
 
 		// reset camera position
-	  	embeddedCamera = true;
+	  embeddedCamera = true;
 
 		// reset tour
 		initLaps();
-        currentPlaneCheckpointsLap = [];
-        lastPlaneCheck = 0;
-        hideRaceEnd();
+    currentPlaneCheckpointsLap = [];
+    lastPlaneCheck = 0;
+    hideRaceEnd();
+		initTimerLaps();
 
 		// reset speed
-        speedChartData.setValue(0, 1, 0);
-        speedChart.draw(speedChartData, speedChartOptions);
+    speedChartData.setValue(0, 1, 0);
+    speedChart.draw(speedChartData, speedChartOptions);
+
+
 	}
 
     var old_position = [NAV.x, NAV.y];
@@ -427,7 +430,7 @@ function start() {
 	function oneLapDone() {
 		// reset checkpoints done in previous lap
     currentPlaneCheckpointsLap = [];
-		laps += 1;
+
 		// Set to end or increment laps
 
 		if (laps === maxLaps) {
@@ -436,9 +439,11 @@ function start() {
 			updateLaps(laps);
 		} else if(laps < maxLaps){
 
-						updateTimerLaps(clock.getElapsedTime(),laps);
-            updateLaps(laps);
+			updateTimerLaps(clock.getElapsedTime(),laps);
+			laps += 1;
+      updateLaps(laps);
 		}
+
 	}
 }
 
@@ -498,7 +503,7 @@ function updateTimer(time) {
 function updateTimerLaps(time,laps) {
 	document.getElementsByClassName("timelaps"+laps)[0].style.display = 'block';
 	document.getElementsByClassName("timelaps"+laps)[0].innerHTML = "Tour "+laps + " : "+time.toFixed(2);
-
+	clock = new THREE.Clock;
 	if(laps<3){
 		clock.start();
 	}else{
@@ -508,7 +513,7 @@ function updateTimerLaps(time,laps) {
 }
 
 function initTimerLaps(){
-	  clock = new THREE.Clock
+	  clock = new THREE.Clock;
 		clock.start();
 		document.getElementsByClassName("timelaps1")[0].style.display = 'none';
 		document.getElementsByClassName("timelaps2")[0].style.display = 'none';
