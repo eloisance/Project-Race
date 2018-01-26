@@ -55,8 +55,9 @@ function start()
   var oAxeRight = new THREE.Object3D();
   var oAxeCentral = new THREE.Object3D();
 
-	var oPaleLeft = new THREE.Object3D();
-	var oPaleRight = new THREE.Object3D();
+    var oPaleLeft1 = new THREE.Object3D();
+    var oPaleLeft2 = new THREE.Object3D();
+    var oPaleLeft3 = new THREE.Object3D();
 
 
     renderingEnvironment.addToScene(oHelico);
@@ -69,8 +70,9 @@ function start()
     renderingEnvironment.addToScene(oAxeRight);
     renderingEnvironment.addToScene(oAxeCentral);
 
-    renderingEnvironment.addToScene(oPaleLeft);
-    renderingEnvironment.addToScene(oPaleRight);
+    renderingEnvironment.addToScene(oPaleLeft1);
+    renderingEnvironment.addToScene(oPaleLeft2);
+    renderingEnvironment.addToScene(oPaleLeft3);
 
 
 	// Helico
@@ -110,6 +112,12 @@ function start()
     oAxeCentral.position.z = 5;
     oAxeCentral.rotation.x = Math.PI / 2;
 
+    // Pale Left 1
+    oPaleLeft1.position.x = 0;
+    oPaleLeft1.position.y = 2;
+    oPaleLeft1.position.z = 0;
+
+    oAxeLeft.add(oPaleLeft1);
 
     var helico = Loader.load({filename: 'assets/helico/helicoCorp.obj', node: oHelico, name: 'helico'});
 
@@ -121,6 +129,8 @@ function start()
 
     var turbineLeft = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineCentral, name: 'turbineC'});
     var axeLeft = Loader.load({filename: 'assets/helico/axe.obj', node: oAxeCentral, name: 'axeC'});
+
+    var paleLeft1 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleLeft1, name: 'oPaleLeft1'});
 
     // 90° = MAth.PI / 4
 
