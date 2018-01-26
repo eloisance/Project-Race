@@ -267,9 +267,27 @@ function start()
 	function render() {
 		requestAnimationFrame( render );
 		handleKeys();
-		// Rendering
+
+
+
+        // Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
 	};
 
+    tournertournerlemanage();
 	render();
+
+	function tournertournerlemanage() {
+        setInterval(function() {
+            paleLeft1.rotation.y = paleLeft1.rotation.y + 2 * Math.PI * 3/100;
+            paleLeft2.rotation.y = paleLeft2.rotation.y + 2 * Math.PI * 3/100;
+            paleLeft3.rotation.y = paleLeft3.rotation.y + 2 * Math.PI * 3/100;
+            paleRight1.rotation.y = paleRight1.rotation.y + 2 * Math.PI * 3/100;
+            paleRight2.rotation.y = paleRight2.rotation.y + 2 * Math.PI * 3/100;
+            paleRight3.rotation.y = paleRight3.rotation.y + 2 * Math.PI * 3/100;
+            paleCentral1.rotation.y = paleCentral1.rotation.y + 2 * Math.PI * 3/100;
+            paleCentral2.rotation.y = paleCentral2.rotation.y + 2 * Math.PI * 3/100;
+            paleCentral3.rotation.y = paleCentral3.rotation.y + 2 * Math.PI * 3/100;
+        }, 10);
+    }
 }
