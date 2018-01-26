@@ -43,11 +43,60 @@ function start()
 	renderingEnvironment.camera.position.y = 0 ;
 	renderingEnvironment.camera.position.z = 40 ;
 
+	// **** Helico **** //
+
+	var oHelico = new THREE.Object3D();
+    var oTurbineLeft = new THREE.Object3D();
+    var oTurbineRight = new THREE.Object3D();
+    var oAxeLeft = new THREE.Object3D();
+    var oAxeRight = new THREE.Object3D();
+	var oPaleLeft = new THREE.Object3D();
+	var oPaleRight = new THREE.Object3D();
+
+
+    renderingEnvironment.addToScene(oHelico);
+    renderingEnvironment.addToScene(oTurbineLeft);
+    renderingEnvironment.addToScene(oTurbineRight);
+    renderingEnvironment.addToScene(oAxeLeft);
+    renderingEnvironment.addToScene(oAxeRight);
+    renderingEnvironment.addToScene(oPaleLeft);
+    renderingEnvironment.addToScene(oPaleRight);
+
+
 	// Helico
+    oHelico.position.x = 0;
+    oHelico.position.y = 0;
+    oHelico.position.z = 0;
 
-    Loader.load()
-    ('assets/helico/pale.obj',function ( object ) {renderingEnvironment.addToScene( object );});
+    // Turbine Right
+    oTurbineRight.position.x = 8.5;
+    oTurbineRight.position.y = -3;
+    oTurbineRight.position.z = 4;
 
+    // Axe Right
+    oAxeRight.position.x = 8.5;
+    oAxeRight.position.y = -2;
+    oAxeRight.position.z = 4;
+
+    // Turbine Left
+    oTurbineLeft.position.x = -8.5;
+    oTurbineLeft.position.y = -3;
+    oTurbineLeft.position.z = 4;
+
+    // Axe Right
+    oAxeLeft.position.x = -8.5;
+    oAxeLeft.position.y = -2;
+    oAxeLeft.position.z = 4;
+
+
+    var helico = Loader.load({filename: 'assets/helico/helicoCorp.obj', node: oHelico, name: 'helico'});
+    var turbineRight = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineRight, name: 'turbine'});
+    var axeRight = Loader.load({filename: 'assets/helico/axe.obj', node: oTurbineRight, name: 'axe'});
+    var turbineLeft = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineLeft, name: 'axe'});
+    var axeLeft = Loader.load({filename: 'assets/helico/axe.obj', node: oAxeLeft, name: 'axe'});
+
+
+    // 90° = MAth.PI / 4
 
 
 	//	event listener
