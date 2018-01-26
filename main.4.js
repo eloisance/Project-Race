@@ -47,17 +47,21 @@ function start()
 
 	var oHelico = new THREE.Object3D();
 
-  var oTurbineLeft = new THREE.Object3D();
-  var oTurbineRight = new THREE.Object3D();
-  var oTurbineCentral = new THREE.Object3D();
+    var oTurbineLeft = new THREE.Object3D();
+    var oTurbineRight = new THREE.Object3D();
+    var oTurbineCentral = new THREE.Object3D();
 
-  var oAxeLeft = new THREE.Object3D();
-  var oAxeRight = new THREE.Object3D();
-  var oAxeCentral = new THREE.Object3D();
+    var oAxeLeft = new THREE.Object3D();
+    var oAxeRight = new THREE.Object3D();
+    var oAxeCentral = new THREE.Object3D();
 
     var oPaleLeft1 = new THREE.Object3D();
     var oPaleLeft2 = new THREE.Object3D();
     var oPaleLeft3 = new THREE.Object3D();
+
+    var oPaleCentral1 = new THREE.Object3D();
+    var oPaleCentral2 = new THREE.Object3D();
+    var oPaleCentral3 = new THREE.Object3D();
 
 
     renderingEnvironment.addToScene(oHelico);
@@ -73,6 +77,10 @@ function start()
     renderingEnvironment.addToScene(oPaleLeft1);
     renderingEnvironment.addToScene(oPaleLeft2);
     renderingEnvironment.addToScene(oPaleLeft3);
+
+    renderingEnvironment.addToScene(oPaleCentral1);
+    renderingEnvironment.addToScene(oPaleCentral2);
+    renderingEnvironment.addToScene(oPaleCentral3);
 
 
 	// Helico
@@ -119,6 +127,30 @@ function start()
 
     oAxeLeft.add(oPaleLeft1);
 
+    // Pale Central 1
+    oPaleCentral1.position.x = 0;
+    oPaleCentral1.position.y = 2;
+    oPaleCentral1.position.z = 0;
+    oPaleCentral1.rotation.y = 0;
+
+    oAxeCentral.add(oPaleCentral1);
+
+    // Pale Central 2
+    oPaleCentral2.position.x = 0;
+    oPaleCentral2.position.y = 2;
+    oPaleCentral2.position.z = 0;
+    oPaleCentral2.rotation.y = 90;
+
+    oAxeCentral.add(oPaleCentral2);
+
+    // Pale Central 3
+    oPaleCentral3.position.x = 0;
+    oPaleCentral3.position.y = 2;
+    oPaleCentral3.position.z = 0;
+    oPaleCentral3.rotation.y = 180;
+
+    oAxeCentral.add(oPaleCentral3);
+
     var helico = Loader.load({filename: 'assets/helico/helicoCorp.obj', node: oHelico, name: 'helico'});
 
     var turbineRight = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineRight, name: 'turbineR'});
@@ -132,6 +164,10 @@ function start()
 
     var paleLeft1 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleLeft1, name: 'oPaleLeft1'});
 
+
+    var paleCentral1 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral1, name: 'oPaleCentral1'});
+    var paleCentral2 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral2, name: 'oPaleCentral2'});
+    var paleCentral3 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral3, name: 'oPaleCentral3'});
     // 90° = MAth.PI / 4
 
 
