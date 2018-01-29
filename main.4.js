@@ -106,6 +106,8 @@ function start()
     oAxeRight.position.y = -2;
     oAxeRight.position.z = 4;
 
+    oHelico.add(oAxeRight);
+
     // Turbine Left
     oTurbineLeft.position.x = -8.5;
     oTurbineLeft.position.y = -3;
@@ -115,6 +117,8 @@ function start()
     oAxeLeft.position.x = -8.5;
     oAxeLeft.position.y = -2;
     oAxeLeft.position.z = 4;
+
+    oHelico.add(oAxeLeft);
 
     // Turbine Central
     oTurbineCentral.position.x = 0;
@@ -268,26 +272,19 @@ function start()
 		requestAnimationFrame( render );
 		handleKeys();
 
-
-
         // Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
 	};
 
-    tournertournerlemanage();
+    rotateAxe();
+
 	render();
 
-	function tournertournerlemanage() {
+	function rotateAxe() {
         setInterval(function() {
-            paleLeft1.rotation.y = paleLeft1.rotation.y + 2 * Math.PI * 3/100;
-            paleLeft2.rotation.y = paleLeft2.rotation.y + 2 * Math.PI * 3/100;
-            paleLeft3.rotation.y = paleLeft3.rotation.y + 2 * Math.PI * 3/100;
-            paleRight1.rotation.y = paleRight1.rotation.y + 2 * Math.PI * 3/100;
-            paleRight2.rotation.y = paleRight2.rotation.y + 2 * Math.PI * 3/100;
-            paleRight3.rotation.y = paleRight3.rotation.y + 2 * Math.PI * 3/100;
-            paleCentral1.rotation.y = paleCentral1.rotation.y + 2 * Math.PI * 3/100;
-            paleCentral2.rotation.y = paleCentral2.rotation.y + 2 * Math.PI * 3/100;
-            paleCentral3.rotation.y = paleCentral3.rotation.y + 2 * Math.PI * 3/100;
+            oAxeLeft.rotation.y = oAxeLeft.rotation.y + 2 * Math.PI * 3/100;
+            oAxeRight.rotation.y = oAxeRight.rotation.y + 2 * Math.PI * 3/100;
+            oAxeCentral.rotation.y = oAxeCentral.rotation.y + 2 * Math.PI * 3/100;
         }, 10);
     }
 }
