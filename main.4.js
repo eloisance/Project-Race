@@ -132,6 +132,8 @@ function start()
     oAxeCentral.position.z = 5;
     oAxeCentral.rotation.x = Math.PI / 2;
 
+    oHelico.add(oAxeCentral);
+
     // Pale Left 1
     oPaleLeft1.position.x = 0;
     oPaleLeft1.position.y = 2;
