@@ -516,7 +516,9 @@ function start() {
 		vehicleHelico.stabilizeSkid(50) ;
 		vehicleHelico.stabilizeTurn(1000) ;
 
+		var oldPosition = vehicleHelico.position.clone();
 		vehicleHelico.update(1.0/60);
+		var newPosition = vehicleHelico.position.clone();
 
 
 
@@ -529,7 +531,7 @@ function start() {
 		carPosition.position.set(NAV.x, NAV.y, NAV.z) ;
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
-		vehicle.position.y = NAV.Y ;
+		vehicle.position.y = NAV.y ;
 
 		// update helico
 		vehicleHelico.position.x = NAV.x ;
@@ -563,7 +565,7 @@ function start() {
         		if (currentPlane === 0 && lastPlaneCheck === 29) {
         			// do nothing
         		} else {
-                    document.getElementsByClassName("warning")[0].style.display = 'block';
+                document.getElementsByClassName("warning")[0].style.display = 'block';
 				}
             } else {
                 document.getElementsByClassName("warning")[0].style.display = 'none';
