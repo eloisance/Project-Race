@@ -81,6 +81,7 @@ function start() {
 	//Loader.loadMesh('assets','tree_Zup_02','obj',	renderingEnvironment.scene,'trees',	-340,-340,0,'double');
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
+	// Système à particules : fumée des pots d'échappement
     var conf = {
         textureFile:"assets/particles/particle.png",
         particlesCount: 10000,
@@ -89,9 +90,9 @@ function start() {
 
     var confEmitterD = {
         cone: {
-            center: new THREE.Vector3(2.5,-8,2),
-            height: new THREE.Vector3(1.5,-5,0.5),
-            radius: 1,
+            center: new THREE.Vector3(2.5,-7,2),
+            height: new THREE.Vector3(1.5,-15,1), //(0.5,-15,0.5)
+            radius: 0.25,
             flow: 1000,
         },
         particle: {
@@ -103,9 +104,9 @@ function start() {
     };
     var confEmitterG = {
         cone: {
-            center: new THREE.Vector3(-4.5,-8,2),
-            height: new THREE.Vector3(1.5,-5,0.5),
-            radius: 1,
+            center: new THREE.Vector3(-3.2,-7,2),
+            height: new THREE.Vector3(1.5,-15,1), //(1.5,-4,0.3)
+            radius: 0.25,
             flow: 1000,
         },
         particle: {
@@ -116,15 +117,29 @@ function start() {
         }
     };
     var engine = new ParticleSystem.Engine_Class(conf);
-    var emitL = new ParticleSystem.ConeEmitter_Class(confEmitterD);
-    var emitR = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+    var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
+    var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+
+    // Modificateurs pour gérer les caractéristiques des particules
+        // Gère la durée de vie des particules
     engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
-    engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
-    engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
-    engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+        // prise en compte de la vitesse
     engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
-    engine.addEmitter(emitL);
-    engine.addEmitter(emitR);
+
+        // Empêche les particules de traverser le plan
+    //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class());
+
+     //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class())
+     engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+    //
+     engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    // engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+
+        // Change la couleur des particules avec la durée de vie
+     engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
+
+    engine.addEmitter(emitD);
+    engine.addEmitter(emitG);
 
 
 
