@@ -3,10 +3,12 @@ MAR Project
 
 
 ## Features
-- [ ] Menu Touches
-- [ ] Saut avec le bolide spatial
+- [ ] Menu Touches -> aborted
+- [x] Saut avec le bolide spatial
 - [x] Compteur de vitesse
-- [ ] Compteur de tours
+- [x] Compteur de tours
+- [ ] Ajout d'un hélico
+- [ ] Ajout fumée pot d'échappement
 
 
 ## Authors 
