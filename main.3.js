@@ -646,6 +646,9 @@ function start() {
         current_position = [NAV.x, NAV.y]
     }, time);
 
+
+    rotateAxe();
+
 	render();
 
     /**
@@ -679,6 +682,14 @@ function start() {
 		}
 
 	}
+
+    function rotateAxe() {
+        setInterval(function() {
+            oAxeLeft.rotation.y = oAxeLeft.rotation.y + 2 * Math.PI * 3/100;
+            oAxeRight.rotation.y = oAxeRight.rotation.y + 2 * Math.PI * 3/100;
+            oAxeCentral.rotation.y = oAxeCentral.rotation.y + 2 * Math.PI * 3/100;
+        }, 10);
+    }
 }
 
 /**
