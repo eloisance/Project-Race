@@ -73,6 +73,11 @@ function start() {
 		zAngle : CARtheta+Math.PI/2.0
 	});
 
+	var vehicleHelico = new FlyingVehicle({
+		position: new THREE.Vector3(CARx, CARy, CARz),
+		zAngle : CARtheta+Math.PI/2.0
+	});
+
 	// Rendering env
 	var renderingEnvironment =  new ThreeRenderingEnv();
 
@@ -159,6 +164,14 @@ function start() {
     var oPaleCentral2 = new THREE.Object3D();
     var oPaleCentral3 = new THREE.Object3D();
 
+		var HelicoFloorSlope = new THREE.Object3D();
+		HelicoFloorSlope.name = 'helico1';
+		oHelico.add(HelicoFloorSlope);
+		// car vertical rotation
+		var HelicoRotationZ = new THREE.Object3D();
+		HelicoRotationZ.name = 'helico2';
+		HelicoFloorSlope.add(HelicoRotationZ);
+		HelicoRotationZ.rotation.z = CARtheta ;
 
     renderingEnvironment.addToScene(oHelico);
 
@@ -198,7 +211,7 @@ function start() {
     oAxeRight.position.y = -2;
     oAxeRight.position.z = 4;
 
-    oHelico.add(oAxeRight);
+    HelicoRotationZ.add(oAxeRight);
 
     // Turbine Left
     oTurbineLeft.position.x = -8.5;
@@ -210,7 +223,7 @@ function start() {
     oAxeLeft.position.y = -2;
     oAxeLeft.position.z = 4;
 
-    oHelico.add(oAxeLeft);
+    HelicoRotationZ.add(oAxeLeft);
 
     // Turbine Central
     oTurbineCentral.position.x = 0;
@@ -224,7 +237,7 @@ function start() {
     oAxeCentral.position.z = 5;
     oAxeCentral.rotation.x = Math.PI / 2;
 
-    oHelico.add(oAxeCentral);
+    HelicoRotationZ.add(oAxeCentral);
 
     // Pale Left 1
     oPaleLeft1.position.x = 0;
@@ -292,7 +305,9 @@ function start() {
     oAxeCentral.add(oPaleCentral2);
     oAxeCentral.add(oPaleCentral3);
 
-    var helico = Loader.load({filename: 'assets/helico/helicoCorp.obj', node: oHelico, name: 'helico'});
+
+
+    var helico = Loader.load({filename: 'assets/helico/helicoCorp.obj', node: HelicoRotationZ, name: 'helico'});
 
     var turbineRight = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineRight, name: 'turbineR'});
     var axeRight = Loader.load({filename: 'assets/helico/axe.obj', node: oAxeRight, name: 'axeR'});
@@ -402,16 +417,20 @@ function start() {
 			});
 		}
 		if (currentlyPressedKeys[68]) { // (D) Right
-			vehicle.turnRight(1000) ;
+			vehicleHelico.turnRight(1000) ;
+			//vehicle.turnRight(1000) ;
 		}
 		if (currentlyPressedKeys[81]) { // (Q) Left
-			vehicle.turnLeft(1000) ;
+			vehicleHelico.turnLeft(1000) ;
+			//vehicle.turnLeft(1000) ;
 		}
 		if (currentlyPressedKeys[90]) { // (Z) Up
-			vehicle.goFront(1200, 1200) ;
+			vehicleHelico.goFront(1200, 1200) ;
+			//vehicle.goFront(1200, 1200) ;
 		}
 		if (currentlyPressedKeys[83]) { // (S) Down
-			vehicle.brake(100) ;
+			vehicleHelico.brake(100) ;
+			//vehicle.brake(100) ;
 		}
 	}
 
@@ -490,19 +509,38 @@ function start() {
 		var oldPosition = vehicle.position.clone();
 		vehicle.update(1.0/60);
 		var newPosition = vehicle.position.clone();
+
+		// helico stabilization
+		vehicleHelico.goUp(vehicleHelico.weight()/4.0, vehicleHelico.weight()/4.0, vehicleHelico.weight()/4.0, vehicleHelico.weight()/4.0) ;
+		vehicleHelico.stopAngularSpeedsXY() ;
+		vehicleHelico.stabilizeSkid(50) ;
+		vehicleHelico.stabilizeTurn(1000) ;
+
+		vehicleHelico.update(1.0/60);
+
+
+
 		newPosition.sub(oldPosition);
 		// NAV
 		NAV.move(newPosition.x, newPosition.y, 150,10) ;
+		// OHelico
+		oHelico.position.set(NAV.x, NAV.y, NAV.z) ;
 		// carPosition
 		carPosition.position.set(NAV.x, NAV.y, NAV.z) ;
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
 		vehicle.position.y = NAV.Y ;
+
+		// update helico
+		vehicleHelico.position.x = NAV.x ;
+		vehicleHelico.position.y = NAV.y ;
 		// Updates carFloorSlope
 		carFloorSlope.matrixAutoUpdate = false;
 		carFloorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
 		// Updates carRotationZ
 		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
+
+		HelicoRotationZ.rotation.z = vehicleHelico.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
 		if (!raceEnd){
@@ -537,7 +575,8 @@ function start() {
         }
 
 		if (embeddedCamera) {
-			carGeometry.add(renderingEnvironment.camera);
+			helico.add(renderingEnvironment.camera);
+			//carGeometry.add(renderingEnvironment.camera);
 			renderingEnvironment.camera.position.x = 0.0;
 			renderingEnvironment.camera.position.z = 10.0;
 			renderingEnvironment.camera.position.y = -25.0;
