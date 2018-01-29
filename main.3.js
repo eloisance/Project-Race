@@ -206,6 +206,8 @@ function start() {
     oTurbineRight.position.y = -3;
     oTurbineRight.position.z = 4;
 
+    HelicoRotationZ.add(oTurbineRight);
+
     // Axe Right
     oAxeRight.position.x = 8.5;
     oAxeRight.position.y = -2;
@@ -217,6 +219,8 @@ function start() {
     oTurbineLeft.position.x = -8.5;
     oTurbineLeft.position.y = -3;
     oTurbineLeft.position.z = 4;
+
+    HelicoRotationZ.add(oTurbineLeft);
 
     // Axe Left
     oAxeLeft.position.x = -8.5;
@@ -230,6 +234,8 @@ function start() {
     oTurbineCentral.position.y = 3;
     oTurbineCentral.position.z = 4;
     oTurbineCentral.rotation.x = Math.PI / 2;
+
+    HelicoRotationZ.add(oTurbineCentral);
 
     // Axe Central
     oAxeCentral.position.x = 0;
