@@ -409,6 +409,10 @@ function start() {
 		if (event.keyCode === 32) {
         	jump();
 		}
+		// (N) for change vehicle + reset game
+		if (event.keyCode === 78) {
+            changeVehicleUsed();
+		}
 		// (Esc) for returning to the menu --> 27
 	}
 
@@ -698,6 +702,10 @@ function start() {
             oAxeCentral.rotation.y = oAxeCentral.rotation.y + 2 * Math.PI * 3/100;
         }, 10);
     }
+
+    function changeVehicleUsed() {
+		resetGame();
+	}
 }
 
 /**
