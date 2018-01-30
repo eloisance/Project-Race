@@ -13,8 +13,8 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js"]) ;
-            ModulesLoader.requireModules(["ParticleSystem.js"]) ;
-            ModulesLoader.requireModules(["Interpolators.js", "MathExt.js"]) ;
+      ModulesLoader.requireModules(["ParticleSystem.js"]) ;
+      ModulesLoader.requireModules(["Interpolators.js", "MathExt.js"]) ;
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -37,6 +37,13 @@ var engine; //particle system
 var oAxeLeft;
 var oAxeRight;
 var oAxeCentral;
+
+// Turbine
+var oTurbineLeft;
+var oTurbineRight;
+var oTurbineCentral;
+
+
 
 // laps
 var laps;
@@ -99,7 +106,7 @@ function start() {
 
 
 	// init chart speed
-    initSpeedometerChart();
+  initSpeedometerChart();
 
     // init laps
 	initLaps();
@@ -243,28 +250,94 @@ function start() {
 	//	callback functions
 	//	---------------------------------------------------------------------------
 	function handleKeyDown(event) {
-		currentlyPressedKeys[event.keyCode] = true;
+
         // (P) Change camera mode
-        if (event.keyCode === 80) {
-            changeCameraMode();
+        if (event.keyCode === 80 && !currentlyPressedKeys[event.keyCode] ) {
+          changeCameraMode();
         }
         // (<--) Backspace - reset game
-		if (event.keyCode === 8) {
+		if (event.keyCode === 8 && !currentlyPressedKeys[event.keyCode] ) {
         	resetGame();
 		}
 		// (Space) for Jumping
-		if (event.keyCode === 32) {
+		if (event.keyCode === 32 && !currentlyPressedKeys[event.keyCode] ) {
         	jump();
 		}
 		// (N) for change vehicle + reset game
-		if (event.keyCode === 78) {
-            changeVehicleUsed(renderingEnvironment, Loader);
+		if (event.keyCode === 78 && !currentlyPressedKeys[event.keyCode] ) {
+          changeVehicleUsed(renderingEnvironment, Loader);
 		}
+
+		if(event.keyCode === 81 && !currentlyPressedKeys[event.keyCode]) { // (Q) Left
+
+			var intervalRight = setInterval(function(){
+
+				if(Math.round(oTurbineLeft.rotation.z*100)/100 > -0.20 && currentlyPressedKeys[81]){
+					oTurbineLeft.rotation.z -= 0.01;
+					oTurbineRight.rotation.z -= 0.01;
+
+				}else if(!currentlyPressedKeys[81] && Math.round(oTurbineLeft.rotation.z*100)/100 <= 0){
+					if(Math.round(oTurbineLeft.rotation.z*100)/100 < 0.20) {
+						oTurbineLeft.rotation.z +=  0.01;
+						oTurbineRight.rotation.z += 0.01;
+					}
+				}else if(!currentlyPressedKeys[81]){
+
+					clearInterval(intervalRight);
+				}
+			}, 50);
+		}
+
+		if(event.keyCode === 68 && !currentlyPressedKeys[event.keyCode]) { // (D) Right
+
+			var intervalLeft = setInterval(function(){
+
+				if(Math.round(oTurbineLeft.rotation.z*100)/100 < 0.20 && currentlyPressedKeys[68] ){
+					oTurbineLeft.rotation.z +=  0.01;
+					oTurbineRight.rotation.z += 0.01;
+
+				}else if(!currentlyPressedKeys[68] && Math.round(oTurbineLeft.rotation.z*100)/100 !== 0){
+					if(Math.round(oTurbineLeft.rotation.z*100)/100 > -0.20){
+						oTurbineLeft.rotation.z -= 0.01;
+						oTurbineRight.rotation.z -= 0.01;
+					}
+				}else if(!currentlyPressedKeys[68]){
+
+					clearInterval(intervalLeft);
+				}
+			}, 50);
+		}
+		currentlyPressedKeys[event.keyCode] = true;
 		// (Esc) for returning to the menu --> 27
 	}
 
 	function handleKeyUp(event) {
 		currentlyPressedKeys[event.keyCode] = false;
+		//console.log("merde");
+		if (event.keyCode == 68) { // (D) Right
+
+			// var returnLeft = setInterval(function(){
+			//
+			// 	if(oTurbineLeft.rotation.z !== 0 ){
+			// 		oTurbineLeft.rotation.z +=  0.01;
+			// 		oTurbineRight.rotation.z += 0.01;
+			// 	}else{
+			// 		clearInterval(returnLeft);
+			// 	}
+			// }, 500);
+		}
+		if (event.keyCode == 81) { // (Q) Left
+
+			// var returnRight = setInterval(function(){
+			//
+			// 	if(oTurbineLeft.rotation.z !== 0 ){
+			// 		oTurbineLeft.rotation.z -= 0.01;
+			// 		oTurbineRight.rotation.z -= 0.01;
+			// 	}else{
+			// 		clearInterval(returnRight);
+			// 	}
+			// }, 500);
+		}
 	}
 
 	function handleKeys() {
@@ -274,10 +347,12 @@ function start() {
 			});
 		}
 		if (currentlyPressedKeys[68]) { // (D) Right
-			vehicle.turnRight(1000) ;
+			vehicle.turnRight(1000);
+
 		}
 		if (currentlyPressedKeys[81]) { // (Q) Left
-			vehicle.turnLeft(1000) ;
+			vehicle.turnLeft(1000);
+
 		}
 		if (currentlyPressedKeys[90]) { // (Z) Up
 			vehicle.goFront(1200, 1200) ;
@@ -286,6 +361,8 @@ function start() {
 			vehicle.brake(100) ;
 		}
 	}
+
+
 
     /**
 	 * Change camera mode !
@@ -371,8 +448,8 @@ function start() {
 		// position
 		if(isCar) {
 			position.position.set(NAV.x, NAV.y, NAV.z) ;
-		}else {
-			position.position.set(NAV.x, NAV.y, NAV.z+20) ;
+		} else {
+			position.position.set(NAV.x, NAV.y, NAV.z + 20);
 		}
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
@@ -493,6 +570,10 @@ function start() {
 		// Update position
         old_position = current_position;
         current_position = [NAV.x, NAV.y];
+        // Update z angle of vehicle
+		if (!isCar) {
+            position.rotation.x = Math.PI / 15 + speedOfVehicle / 300;
+		}
     }, time);
 
 
@@ -699,9 +780,9 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 
 		position = new THREE.Object3D();
 
-		var oTurbineLeft = new THREE.Object3D();
-		var oTurbineRight = new THREE.Object3D();
-		var oTurbineCentral = new THREE.Object3D();
+		oTurbineLeft = new THREE.Object3D();
+		oTurbineRight = new THREE.Object3D();
+		oTurbineCentral = new THREE.Object3D();
 
 		oAxeLeft = new THREE.Object3D();
 		oAxeRight = new THREE.Object3D();
@@ -764,11 +845,11 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 		rotationZ.add(oTurbineRight);
 
 		// Axe Right
-		oAxeRight.position.x = 8.5;
-		oAxeRight.position.y = -2;
-		oAxeRight.position.z = 4;
+		oAxeRight.position.x = 0;
+		oAxeRight.position.y = 1.5;
+		oAxeRight.position.z = 0;
 
-		rotationZ.add(oAxeRight);
+		oTurbineRight.add(oAxeRight);
 
 		// Turbine Left
 		oTurbineLeft.position.x = -8.5;
@@ -778,11 +859,11 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 		rotationZ.add(oTurbineLeft);
 
 		// Axe Left
-		oAxeLeft.position.x = -8.5;
-		oAxeLeft.position.y = -2;
-		oAxeLeft.position.z = 4;
+		oAxeLeft.position.x = 0;
+		oAxeLeft.position.y = 1.5;
+		oAxeLeft.position.z = 0;
 
-		rotationZ.add(oAxeLeft);
+		oTurbineLeft.add(oAxeLeft);
 
 		// Turbine Central
 		oTurbineCentral.position.x = 0;
@@ -929,6 +1010,21 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
     rotationZ.add(engine.particleSystem);
 }
 
+function turnAxeRight(){
+
+	if(oTurbineLeft.rotation.z > -0.20 ){
+		oTurbineLeft.rotation.z -= 0.01;
+		oTurbineRight.rotation.z -= 0.01;
+	}
+}
+
+function turnAxeLeft(){
+
+	if(oTurbineLeft.rotation.z < 0.20 ){
+		oTurbineLeft.rotation.z +=  0.01;
+		oTurbineRight.rotation.z += 0.01;
+	}
+}
 
 /**
  * Init laps

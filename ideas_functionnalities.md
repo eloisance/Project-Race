@@ -4,8 +4,8 @@
 - [x] timeur de tours
 - [x] fumee pot d'echappement
 - [ ] menu avec les touches lorsqu'on appuie sur Esc
-- [ ] Rotation des turbines dans les virages
-- [ ] rotation des hélices en fonction de la vitesse
+- [x] Rotation des turbines dans les virages
+- [x] rotation des hélices en fonction de la vitesse
 - [ ] Particules moins grandes
 - [ ] Emission des particules en fonction de la vitesse
-- [ ] Pencher helico selon sa vitesse
+- [x] Pencher helico selon sa vitesse
