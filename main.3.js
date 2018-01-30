@@ -22,6 +22,18 @@ requirejs(['ModulesLoaderV2.js'], function()
 // camera mode
 var embeddedCamera = true;
 
+//
+var isCar = false;
+// vehicle
+var vehicle;
+var rotationZ;
+var geometry;
+var position;
+var floorSlope;
+// Axe
+var oAxeLeft;
+var oAxeRight;
+var oAxeCentral;
 
 // laps
 var laps;
@@ -68,10 +80,12 @@ function start() {
 
 	//var gui = new dat.GUI();
 	// Creates the vehicle (handled by physics)
-	var vehicle = new FlyingVehicle({
-		position: new THREE.Vector3(CARx, CARy, CARz),
-		zAngle : CARtheta+Math.PI/2.0
-	});
+
+
+	// var vehicleHelico = new FlyingVehicle({
+	// 	position: new THREE.Vector3(CARx, CARy, CARz),
+	// 	zAngle : CARtheta+Math.PI/2.0
+	// });
 
 	// Rendering env
 	var renderingEnvironment =  new ThreeRenderingEnv();
@@ -81,6 +95,9 @@ function start() {
 
 	// Loading env
 	var Loader = new ThreeLoadingEnv();
+
+
+	initHelico(CARx,CARy,CARz,CARtheta,renderingEnvironment,Loader);
 
 	// init chart speed
   initSpeedometerChart();
@@ -100,28 +117,9 @@ function start() {
 
 	// Car
 	// car Translation
-	var carPosition = new THREE.Object3D();
-	carPosition.name = 'car0';
-	renderingEnvironment.addToScene(carPosition);
-	// initial POS
-	carPosition.position.x = CARx;
-	carPosition.position.y = CARy;
-	carPosition.position.z = CARz;
-	// car Rotation floor slope follow
-	var carFloorSlope = new THREE.Object3D();
-	carFloorSlope.name = 'car1';
-	carPosition.add(carFloorSlope);
-	// car vertical rotation
-	var carRotationZ = new THREE.Object3D();
-	carRotationZ.name = 'car2';
-	carFloorSlope.add(carRotationZ);
-	carRotationZ.rotation.z = CARtheta ;
-	// the car itself
-	// simple method to load an object
-	var carGeometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: carRotationZ, name: 'car3'}) ;
-	carGeometry.position.z= + 2 ;
+
 	// attach the scene camera to car
-//	carGeometry.add(renderingEnvironment.camera) ;
+//	geometry.add(renderingEnvironment.camera) ;
 //	renderingEnvironment.camera.position.x = 0.0 ;
 //	renderingEnvironment.camera.position.z = 10.0 ;
 //	renderingEnvironment.camera.position.y = -25.0 ;
@@ -130,7 +128,17 @@ function start() {
 	//	Skybox
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
 
-	//	Planes Set for Navigation
+
+
+
+
+
+
+
+
+
+
+    //	Planes Set for Navigation
 	// 	z up
 	var NAV = new navPlaneSet(
 					new navPlane('p01',	-260, -180,	 -80, 120,	+0,+0,'px')); 		// 01
@@ -193,6 +201,10 @@ function start() {
 		if (event.keyCode === 32) {
         	jump();
 		}
+		// (N) for change vehicle + reset game
+		if (event.keyCode === 78) {
+            changeVehicleUsed(renderingEnvironment, Loader);
+		}
 		// (Esc) for returning to the menu --> 27
 	}
 
@@ -208,15 +220,19 @@ function start() {
 		}
 		if (currentlyPressedKeys[68]) { // (D) Right
 			vehicle.turnRight(1000) ;
+
 		}
 		if (currentlyPressedKeys[81]) { // (Q) Left
 			vehicle.turnLeft(1000) ;
+
 		}
 		if (currentlyPressedKeys[90]) { // (Z) Up
 			vehicle.goFront(1200, 1200) ;
+
 		}
 		if (currentlyPressedKeys[83]) { // (S) Down
 			vehicle.brake(100) ;
+
 		}
 	}
 
@@ -230,9 +246,9 @@ function start() {
 
 	function jump() {
         console.log("Jumping");
-        console.log("carGeometry.position.z: " + carGeometry.position.z);
-        carGeometry.position.z += 10;
-        setTimeout(function(){ carGeometry.position.z -= 10; }, 1000); //1 seconde d'attente
+        console.log("geometry.position.z: " + geometry.position.z);
+        geometry.position.z += 10;
+        setTimeout(function(){ geometry.position.z -= 10; }, 1000); //1 seconde d'attente
 
     }
 
@@ -295,19 +311,36 @@ function start() {
 		var oldPosition = vehicle.position.clone();
 		vehicle.update(1.0/60);
 		var newPosition = vehicle.position.clone();
+
+
+
+
+
 		newPosition.sub(oldPosition);
 		// NAV
 		NAV.move(newPosition.x, newPosition.y, 150,10) ;
-		// carPosition
-		carPosition.position.set(NAV.x, NAV.y, NAV.z) ;
+		// OHelico
+		// oHelico.position.set(NAV.x, NAV.y, NAV.z) ;
+		// position
+		if(isCar){
+			position.position.set(NAV.x, NAV.y, NAV.z) ;
+		}else{
+				position.position.set(NAV.x, NAV.y, NAV.z+20) ;
+		}
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
-		vehicle.position.y = NAV.Y ;
-		// Updates carFloorSlope
-		carFloorSlope.matrixAutoUpdate = false;
-		carFloorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
-		// Updates carRotationZ
-		carRotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
+		vehicle.position.y = NAV.y ;
+
+		// update helico
+		// vehicleHelico.position.x = NAV.x ;
+		// vehicleHelico.position.y = NAV.y ;
+		// Updates floorSlope
+		floorSlope.matrixAutoUpdate = false;
+		floorSlope.matrix.copy(NAV.localMatrix(CARx,CARy));
+		// Updates rotationZ
+		rotationZ.rotation.z = vehicle.angles.z-Math.PI/2.0;
+
+		//HelicoRotationZ.rotation.z = vehicleHelico.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
 		if (!raceEnd){
@@ -330,7 +363,7 @@ function start() {
         		if (currentPlane === 0 && lastPlaneCheck === 29) {
         			// do nothing
         		} else {
-                    document.getElementsByClassName("warning")[0].style.display = 'block';
+                document.getElementsByClassName("warning")[0].style.display = 'block';
 				}
             } else {
                 document.getElementsByClassName("warning")[0].style.display = 'none';
@@ -342,7 +375,8 @@ function start() {
         }
 
 		if (embeddedCamera) {
-			carGeometry.add(renderingEnvironment.camera);
+			// helico.add(renderingEnvironment.camera);
+			geometry.add(renderingEnvironment.camera);
 			renderingEnvironment.camera.position.x = 0.0;
 			renderingEnvironment.camera.position.z = 10.0;
 			renderingEnvironment.camera.position.y = -25.0;
@@ -350,7 +384,7 @@ function start() {
 			renderingEnvironment.camera.rotation.y = 0;
 			renderingEnvironment.camera.rotation.z = 0;
 		} else {
-			carGeometry.remove(renderingEnvironment.camera);
+			geometry.remove(renderingEnvironment.camera);
             // Camera position
             renderingEnvironment.camera.position.x = items[currentPlane][0];
             renderingEnvironment.camera.position.y = items[currentPlane][1];
@@ -412,7 +446,10 @@ function start() {
         current_position = [NAV.x, NAV.y]
     }, time);
 
-	render();
+
+    rotateAxe();
+
+		render();
 
     /**
 	 * Return true if all checkpoints is in currentPlaneCheckpointsLap
@@ -445,6 +482,29 @@ function start() {
 		}
 
 	}
+
+    function rotateAxe() {
+        setInterval(function() {
+            oAxeLeft.rotation.y = oAxeLeft.rotation.y + 2 * Math.PI * 3/100;
+            oAxeRight.rotation.y = oAxeRight.rotation.y + 2 * Math.PI * 3/100;
+            oAxeCentral.rotation.y = oAxeCentral.rotation.y + 2 * Math.PI * 3/100;
+        }, 10);
+    }
+
+    function changeVehicleUsed(renderingEnvironment, Loader) {
+
+			renderingEnvironment.removeToScene(position);
+			renderingEnvironment.removeToScene(floorSlope);
+			renderingEnvironment.removeToScene(rotationZ);
+
+			if(isCar){
+				initHelico(CARx,CARy,CARz,CARtheta,renderingEnvironment, Loader);
+			}else{
+				initCar(CARx,CARy,CARz,CARtheta,renderingEnvironment, Loader);
+			}
+			isCar = !isCar;
+			resetGame();
+	}
 }
 
 /**
@@ -465,6 +525,247 @@ function initSpeedometerChart() {
 }
 
 /**
+ * Load Car
+ */
+function initCar(x, y, z, theta, renderingEnvironment, Loader){
+	vehicle = new FlyingVehicle({
+		position: new THREE.Vector3(x, y, z),
+		zAngle : theta+Math.PI/2.0
+	});
+
+	position = new THREE.Object3D();
+	position.name = 'car0';
+	renderingEnvironment.addToScene(position);
+	// initial POS
+	position.position.x = x;
+	position.position.y = y;
+	position.position.z = z;
+	// car Rotation floor slope follow
+	floorSlope = new THREE.Object3D();
+	floorSlope.name = 'car1';
+	position.add(floorSlope);
+	// car vertical rotation
+	rotationZ = new THREE.Object3D();
+	rotationZ.name = 'car2';
+	floorSlope.add(rotationZ);
+	rotationZ.rotation.z = theta;
+	// the car itself
+	// simple method to load an object
+	geometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: rotationZ, name: 'car3'});
+	geometry.position.z = + 2;
+
+
+}
+
+/**
+ * Load Helico
+ */
+function initHelico(x, y, z, theta, renderingEnvironment, Loader){
+	// ******* START HELICO *******
+		vehicle = new FlyingVehicle({
+			position: new THREE.Vector3(x, y, z),
+			zAngle : theta+Math.PI/2.0
+		} );
+
+		position = new THREE.Object3D();
+
+		var oTurbineLeft = new THREE.Object3D();
+		var oTurbineRight = new THREE.Object3D();
+		var oTurbineCentral = new THREE.Object3D();
+
+		oAxeLeft = new THREE.Object3D();
+		oAxeRight = new THREE.Object3D();
+		oAxeCentral = new THREE.Object3D();
+
+		var oPaleLeft1 = new THREE.Object3D();
+		var oPaleLeft2 = new THREE.Object3D();
+		var oPaleLeft3 = new THREE.Object3D();
+
+		var oPaleRight1 = new THREE.Object3D();
+		var oPaleRight2 = new THREE.Object3D();
+		var oPaleRight3 = new THREE.Object3D();
+
+		var oPaleCentral1 = new THREE.Object3D();
+		var oPaleCentral2 = new THREE.Object3D();
+		var oPaleCentral3 = new THREE.Object3D();
+
+		floorSlope = new THREE.Object3D();
+		floorSlope.name = 'helico1';
+		position.add(floorSlope);
+		// car vertical rotation
+		rotationZ = new THREE.Object3D();
+		rotationZ.name = 'helico2';
+		floorSlope.add(rotationZ);
+		rotationZ.rotation.z = theta;
+
+		renderingEnvironment.addToScene(position);
+
+		renderingEnvironment.addToScene(oTurbineLeft);
+		renderingEnvironment.addToScene(oTurbineRight);
+		renderingEnvironment.addToScene(oTurbineCentral);
+
+		renderingEnvironment.addToScene(oAxeLeft);
+		renderingEnvironment.addToScene(oAxeRight);
+		renderingEnvironment.addToScene(oAxeCentral);
+
+		renderingEnvironment.addToScene(oPaleLeft1);
+		renderingEnvironment.addToScene(oPaleLeft2);
+		renderingEnvironment.addToScene(oPaleLeft3);
+
+		renderingEnvironment.addToScene(oPaleRight1);
+		renderingEnvironment.addToScene(oPaleRight2);
+		renderingEnvironment.addToScene(oPaleRight3);
+
+		renderingEnvironment.addToScene(oPaleCentral1);
+		renderingEnvironment.addToScene(oPaleCentral2);
+		renderingEnvironment.addToScene(oPaleCentral3);
+
+
+		// Helico
+		position.position.x = x;
+		position.position.y = y;
+		position.position.z = z;
+
+		// Turbine Right
+		oTurbineRight.position.x = 8.5;
+		oTurbineRight.position.y = -3;
+		oTurbineRight.position.z = 4;
+
+		rotationZ.add(oTurbineRight);
+
+		// Axe Right
+		oAxeRight.position.x = 8.5;
+		oAxeRight.position.y = -2;
+		oAxeRight.position.z = 4;
+
+		rotationZ.add(oAxeRight);
+
+		// Turbine Left
+		oTurbineLeft.position.x = -8.5;
+		oTurbineLeft.position.y = -3;
+		oTurbineLeft.position.z = 4;
+
+		rotationZ.add(oTurbineLeft);
+
+		// Axe Left
+		oAxeLeft.position.x = -8.5;
+		oAxeLeft.position.y = -2;
+		oAxeLeft.position.z = 4;
+
+		rotationZ.add(oAxeLeft);
+
+		// Turbine Central
+		oTurbineCentral.position.x = 0;
+		oTurbineCentral.position.y = 3;
+		oTurbineCentral.position.z = 4;
+		oTurbineCentral.rotation.x = Math.PI / 2;
+
+		rotationZ.add(oTurbineCentral);
+
+		// Axe Central
+		oAxeCentral.position.x = 0;
+		oAxeCentral.position.y = 3;
+		oAxeCentral.position.z = 5;
+		oAxeCentral.rotation.x = Math.PI / 2;
+
+		rotationZ.add(oAxeCentral);
+
+		// Pale Left 1
+		oPaleLeft1.position.x = 0;
+		oPaleLeft1.position.y = 2;
+		oPaleLeft1.position.z = 0;
+		oPaleLeft2.rotation.y = 0;
+
+		// Pale Left 2
+		oPaleLeft2.position.x = 0;
+		oPaleLeft2.position.y = 2;
+		oPaleLeft2.position.z = 0;
+		oPaleLeft2.rotation.y = 90;
+
+		// Pale Left 3
+		oPaleLeft3.position.x = 0;
+		oPaleLeft3.position.y = 2;
+		oPaleLeft3.position.z = 0;
+		oPaleLeft3.rotation.y = 180;
+
+		// Pale Right 1
+		oPaleRight1.position.x = 0;
+		oPaleRight1.position.y = 2;
+		oPaleRight1.position.z = 0;
+		oPaleRight1.rotation.y = 0;
+
+		// Pale Right 2
+		oPaleRight2.position.x = 0;
+		oPaleRight2.position.y = 2;
+		oPaleRight2.position.z = 0;
+		oPaleRight2.rotation.y = 90;
+
+		// Pale Right 3
+		oPaleRight3.position.x = 0;
+		oPaleRight3.position.y = 2;
+		oPaleRight3.position.z = 0;
+		oPaleRight3.rotation.y = 180;
+
+		oAxeLeft.add(oPaleLeft1);
+		oAxeLeft.add(oPaleLeft2);
+		oAxeLeft.add(oPaleLeft3);
+
+		oAxeRight.add(oPaleRight1);
+		oAxeRight.add(oPaleRight2);
+		oAxeRight.add(oPaleRight3);
+
+		// Pale Central 1
+		oPaleCentral1.position.x = 0;
+		oPaleCentral1.position.y = 2;
+		oPaleCentral1.position.z = 0;
+		oPaleCentral1.rotation.y = 0;
+
+		// Pale Central 2
+		oPaleCentral2.position.x = 0;
+		oPaleCentral2.position.y = 2;
+		oPaleCentral2.position.z = 0;
+		oPaleCentral2.rotation.y = 90;
+
+		// Pale Central 3
+		oPaleCentral3.position.x = 0;
+		oPaleCentral3.position.y = 2;
+		oPaleCentral3.position.z = 0;
+		oPaleCentral3.rotation.y = 180;
+
+		oAxeCentral.add(oPaleCentral1);
+		oAxeCentral.add(oPaleCentral2);
+		oAxeCentral.add(oPaleCentral3);
+
+
+
+		geometry = Loader.load({filename: 'assets/helico/helicoCorp.obj', node: rotationZ, name: 'helico'});
+
+		var turbineRight = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineRight, name: 'turbineR'});
+		var axeRight = Loader.load({filename: 'assets/helico/axe.obj', node: oAxeRight, name: 'axeR'});
+
+		var turbineLeft = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineLeft, name: 'turbineL'});
+		var axeLeft = Loader.load({filename: 'assets/helico/axe.obj', node: oAxeLeft, name: 'axeL'});
+
+		var turbineCentral = Loader.load({filename: 'assets/helico/turbine.obj', node: oTurbineCentral, name: 'turbineC'});
+		var axeCentral = Loader.load({filename: 'assets/helico/axe.obj', node: oAxeCentral, name: 'axeC'});
+
+		var paleLeft1 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleLeft1, name: 'oPaleLeft1'});
+		var paleLeft2 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleLeft2, name: 'oPaleLeft2'});
+		var paleLeft3 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleLeft3, name: 'oPaleLeft3'});
+
+		var paleRight1 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleRight1, name: 'oPaleRight1'});
+		var paleRight2 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleRight2, name: 'oPaleRight2'});
+		var paleRight3 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleRight3, name: 'oPaleRight3'});
+
+		var paleCentral1 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral1, name: 'oPaleCentral1'});
+		var paleCentral2 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral2, name: 'oPaleCentral2'});
+		var paleCentral3 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral3, name: 'oPaleCentral3'});
+
+		// ******* END HELICO *******
+}
+
+
+/**
  * Init laps
  */
 function initLaps() {
@@ -483,7 +784,7 @@ function updateLaps(newLapsValue) {
  * Show div for race end
  */
 function showRaceEnd() {
-	raceEnd = true;
+		raceEnd = true;
     document.getElementsByClassName("finish")[0].style.display = 'block';
 }
 
