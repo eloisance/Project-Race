@@ -24,13 +24,14 @@ requirejs(['ModulesLoaderV2.js'], function()
 var embeddedCamera = true;
 
 //
-var isCar = false;
+var isCar = true;
 // vehicle
 var vehicle;
-var rotationZ;
-var geometry;
+var rotationZ; //tout hélico
+var geometry; //que body helico
 var position;
 var floorSlope;
+var engine; //particle system
 
 // Axe
 var oAxeLeft;
@@ -96,8 +97,13 @@ function start() {
 	// Loading env
 	var Loader = new ThreeLoadingEnv();
 
+	// Init the vehicule to start with
+    if (isCar) {
+        initCar(CARx,CARy,CARz,CARtheta,renderingEnvironment,Loader);
+    } else {
+        initHelico(CARx,CARy,CARz,CARtheta,renderingEnvironment,Loader);
+    }
 
-	initHelico(CARx,CARy,CARz,CARtheta,renderingEnvironment,Loader);
 
 	// init chart speed
   initSpeedometerChart();
@@ -116,66 +122,66 @@ function start() {
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
 	// Système à particules : fumée des pots d'échappement
-    var conf = {
-        textureFile:"assets/particles/particle.png",
-        particlesCount: 10000,
-        blendingMode:THREE.AdditiveBlending
-    };
-
-    var confEmitterD = {
-        cone: {
-            center: new THREE.Vector3(2.65,-8,2), // 2.5,-7,2  gauche/ profondeur / hauteur
-            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
-            radius: 0.9,
-            flow: 100,
-        },
-        particle: {
-            speed: new MathExt.Interval_Class(5, 10),
-            mass: new MathExt.Interval_Class(0.1 , 0.3),
-            size: new MathExt.Interval_Class(0.1 ,1),
-            lifeTime: new MathExt.Interval_Class(1, 3),
-        }
-    };
-    var confEmitterG = {
-        cone: {
-            center: new THREE.Vector3(-2.65,-8,2), //-3.2,-7,2
-            height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
-            radius: 0.9,
-            flow: 100,
-        },
-        particle: {
-            speed: new MathExt.Interval_Class(5, 10),
-            mass: new MathExt.Interval_Class(0.1 , 0.3),
-            size: new MathExt.Interval_Class(0.1 ,1),
-            lifeTime: new MathExt.Interval_Class(1, 7),
-        }
-    };
-    var engine = new ParticleSystem.Engine_Class(conf);
-    var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
+    // var conf = {
+     //    textureFile:"assets/particles/particle.png",
+     //    particlesCount: 10000,
+     //    blendingMode:THREE.AdditiveBlending
+    // };
+    //
+    // var confEmitterD = {
+     //    cone: {
+     //        center: new THREE.Vector3(2.65,-8,2), // 2.5,-7,2  gauche/ profondeur / hauteur
+     //        height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
+     //        radius: 0.9,
+     //        flow: 100,
+     //    },
+     //    particle: {
+     //        speed: new MathExt.Interval_Class(5, 10),
+     //        mass: new MathExt.Interval_Class(0.1 , 0.3),
+     //        size: new MathExt.Interval_Class(0.1 ,1),
+     //        lifeTime: new MathExt.Interval_Class(1, 3),
+     //    }
+    // };
+    // var confEmitterG = {
+     //    cone: {
+     //        center: new THREE.Vector3(-2.65,-8,2), //-3.2,-7,2
+     //        height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
+     //        radius: 0.9,
+     //        flow: 100,
+     //    },
+     //    particle: {
+     //        speed: new MathExt.Interval_Class(5, 10),
+     //        mass: new MathExt.Interval_Class(0.1 , 0.3),
+     //        size: new MathExt.Interval_Class(0.1 ,1),
+     //        lifeTime: new MathExt.Interval_Class(1, 7),
+     //    }
+    // };
+    // var engine = new ParticleSystem.Engine_Class(conf);
+    // var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
    // var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
 
-    // Modificateurs pour gérer les caractéristiques des particules
-        // Gère la durée de vie des particules
-    engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
-        // prise en compte de la vitesse
-    //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class());
-    engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
-    engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
-
-    // Empêche les particules de traverser le plan
-    // engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
-
+    // Modificateurs pour gérer les caractéri    // engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+    //     // prise en compte de la vitesse
+    // //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class());
+    // engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+    // engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
     //
-    engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
-    engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    //     // Empêche les particules de traverser le plan
+    // //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
+    //
+    // //
+    //  engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    //  engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    //
+    //     // Change la couleur des particules avec la durée de vie
+    //  engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
+    //
+    // engine.addEmitter(emitD);
+    // //engine.addEmitter(emitG);
+    //
+    // //applyaxisanglestiques des particules
+        // Gère la durée de vie des particules
 
-        // Change la couleur des particules avec la durée de vie
-    engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
-
-    engine.addEmitter(emitD);
-    //engine.addEmitter(emitG);
-
-    //applyaxisangle
 
 
 	// Car
@@ -189,7 +195,7 @@ function start() {
 //	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
 
 	// Add particle system
-	geometry.add(engine.particleSystem);
+	//rotationZ.add(engine.particleSystem); //geometry
 
 	//	Skybox
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
@@ -285,7 +291,7 @@ function start() {
 		if(event.keyCode === 68 && !currentlyPressedKeys[event.keyCode]) { // (D) Right
 
 			var intervalLeft = setInterval(function(){
-				
+
 				if(Math.round(oTurbineLeft.rotation.z*100)/100 < 0.20 && currentlyPressedKeys[68] ){
 					oTurbineLeft.rotation.z +=  0.01;
 					oTurbineRight.rotation.z += 0.01;
@@ -368,7 +374,7 @@ function start() {
 
 	function jump() {
         console.log("Jumping");
-        console.log("geometry.position.z: " + rotationZ.position.z);
+        console.log("rotationZ.position.z: " + rotationZ.position.z);
         rotationZ.position.z += 10;
         setTimeout(function(){ rotationZ.position.z -= 10; }, 1000); //1 seconde d'attente
 
@@ -518,7 +524,8 @@ function start() {
 
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
-    engine.animate(0.4, render);
+        //engine = addParticleSystem();
+        engine.animate(0.4, render);
 
         //console.log("old_pos" + old_position)
 	};
@@ -619,9 +626,9 @@ function start() {
 			renderingEnvironment.removeToScene(floorSlope);
 			renderingEnvironment.removeToScene(rotationZ);
 
-			if(isCar){
+			if (isCar) {
 				initHelico(CARx,CARy,CARz,CARtheta,renderingEnvironment, Loader);
-			}else{
+			} else {
 				initCar(CARx,CARy,CARz,CARtheta,renderingEnvironment, Loader);
 			}
 			isCar = !isCar;
@@ -644,6 +651,75 @@ function initSpeedometerChart() {
         ]);
         speedChart.draw(speedChartData, speedChartOptions);
     }
+}
+
+/**
+ * Load Particle system
+ */
+function addParticleSystem(){
+
+    //Configurations
+
+    var conf = {
+        textureFile:"assets/particles/particle.png",
+        particlesCount: 10000,
+        blendingMode:THREE.AdditiveBlending
+    };
+
+    var confEmitterD = {
+        cone: {
+            center: new THREE.Vector3(2.65,-8,2), // 2.5,-7,2  gauche/ profondeur / hauteur
+            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
+            radius: 0.9,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5, 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1, 3),
+        }
+    };
+    var confEmitterG = {
+        cone: {
+            center: new THREE.Vector3(-2.65,-8,2), //-3.2,-7,2
+            height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
+            radius: 0.9,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5, 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1, 7),
+        }
+    };
+
+    // Particle System
+    engine = new ParticleSystem.Engine_Class(conf);
+    var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
+    //var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+// Modificateurs pour gérer les caractéristiques des particules
+    // Gère la durée de vie des particules
+    engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+    // prise en compte de la vitesse
+    //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class());
+    engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+    engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
+
+    // Empêche les particules de traverser le plan
+    //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
+
+    //
+    engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+
+    // Change la couleur des particules avec la durée de vie
+    engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
+
+    engine.addEmitter(emitD);
+
+    return engine;
 }
 
 /**
@@ -676,6 +752,9 @@ function initCar(x, y, z, theta, renderingEnvironment, Loader){
 	geometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: rotationZ, name: 'car3'});
 	geometry.position.z = + 2;
 
+	// Particles
+	engine = addParticleSystem();
+    rotationZ.add(engine.particleSystem);
 
 }
 
@@ -884,6 +963,10 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 		var paleCentral3 = Loader.load({filename: 'assets/helico/pale.obj', node: oPaleCentral3, name: 'oPaleCentral3'});
 
 		// ******* END HELICO *******
+
+    //Particles
+    engine = addParticleSystem();
+    rotationZ.add(engine.particleSystem);
 }
 
 function turnAxeRight(){
