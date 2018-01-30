@@ -108,7 +108,7 @@ function start() {
 	// init chart speed
   initSpeedometerChart();
 
-    // init laps
+  // init laps
 	initLaps();
 
 	// initTimerLaps
@@ -123,16 +123,6 @@ function start() {
 
 
 
-    // Car
-	// car Translation
-
-	// attach the scene camera to car
-//	geometry.add(renderingEnvironment.camera) ;
-//	renderingEnvironment.camera.position.x = 0.0 ;
-//	renderingEnvironment.camera.position.z = 10.0 ;
-//	renderingEnvironment.camera.position.y = -25.0 ;
-//	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
-
 
 	//	Skybox
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
@@ -142,10 +132,7 @@ function start() {
 	var NAV = getNavPlaneSet();
 	NAV.setPos(CARx,CARy,CARz);
 	NAV.initActive();
-	// DEBUG
-	// NAV.debug();
-	// var navMesh = NAV.toMesh();
-	// renderingEnvironment.addToScene(navMesh);
+
 	//	event listener
 	//	---------------------------------------------------------------------------
 	//	resize window
@@ -220,31 +207,8 @@ function start() {
 
 	function handleKeyUp(event) {
 		currentlyPressedKeys[event.keyCode] = false;
-		//console.log("merde");
-		if (event.keyCode == 68) { // (D) Right
 
-			// var returnLeft = setInterval(function(){
-			//
-			// 	if(oTurbineLeft.rotation.z !== 0 ){
-			// 		oTurbineLeft.rotation.z +=  0.01;
-			// 		oTurbineRight.rotation.z += 0.01;
-			// 	}else{
-			// 		clearInterval(returnLeft);
-			// 	}
-			// }, 500);
-		}
-		if (event.keyCode == 81) { // (Q) Left
 
-			// var returnRight = setInterval(function(){
-			//
-			// 	if(oTurbineLeft.rotation.z !== 0 ){
-			// 		oTurbineLeft.rotation.z -= 0.01;
-			// 		oTurbineRight.rotation.z -= 0.01;
-			// 	}else{
-			// 		clearInterval(returnRight);
-			// 	}
-			// }, 500);
-		}
 	}
 
 	function handleKeys() {
@@ -885,22 +849,6 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
     oTurbineLeft.add(enginebis.particleSystem);
 
 
-}
-
-function turnAxeRight(){
-
-	if(oTurbineLeft.rotation.z > -0.20 ){
-		oTurbineLeft.rotation.z -= 0.01;
-		oTurbineRight.rotation.z -= 0.01;
-	}
-}
-
-function turnAxeLeft(){
-
-	if(oTurbineLeft.rotation.z < 0.20 ){
-		oTurbineLeft.rotation.z +=  0.01;
-		oTurbineRight.rotation.z += 0.01;
-	}
 }
 
 /**
