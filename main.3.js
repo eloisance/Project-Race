@@ -24,7 +24,7 @@ requirejs(['ModulesLoaderV2.js'], function()
 var embeddedCamera = true;
 
 //
-var isCar = true;
+var isCar = false;
 // vehicle
 var vehicle;
 var rotationZ; //tout hélico
@@ -579,7 +579,7 @@ function initSpeedometerChart() {
 /**
  * Load Particle system
  */
-function addParticleSystem(){
+function addParticleSystem(confEmitterG, confEmitterD){
 
     //Configurations
 
@@ -589,43 +589,17 @@ function addParticleSystem(){
         blendingMode:THREE.AdditiveBlending
     };
 
-    var confEmitterD = {
-        cone: {
-            center: new THREE.Vector3(2.65,-8,2), // 2.5,-7,2  gauche/ profondeur / hauteur
-            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
-            radius: 0.9,
-            flow: 100,
-        },
-        particle: {
-            speed: new MathExt.Interval_Class(5, 10),
-            mass: new MathExt.Interval_Class(0.1 , 0.3),
-            size: new MathExt.Interval_Class(0.1 ,1),
-            lifeTime: new MathExt.Interval_Class(1, 3),
-        }
-    };
-    var confEmitterG = {
-        cone: {
-            center: new THREE.Vector3(-2.65,-8,2), //-3.2,-7,2
-            height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
-            radius: 0.9,
-            flow: 100,
-        },
-        particle: {
-            speed: new MathExt.Interval_Class(5, 10),
-            mass: new MathExt.Interval_Class(0.1 , 0.3),
-            size: new MathExt.Interval_Class(0.1 ,1),
-            lifeTime: new MathExt.Interval_Class(1, 7),
-        }
-    };
+
 
     // Particle System
     engine = new ParticleSystem.Engine_Class(conf);
     var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
-    //var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
-// Modificateurs pour gérer les caractéristiques des particules
-    // Gère la durée de vie des particules
+    var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+
+    // Modificateurs pour gérer les caractéristiques des particules
+        // Gère la durée de vie des particules
     engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
-    // prise en compte de la vitesse
+        // prise en compte de la vitesse
     //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class());
     engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
     engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
@@ -634,13 +608,14 @@ function addParticleSystem(){
     //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
 
     //
-    engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
-    engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+    engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(2,0)));
+    engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(1,0)));
 
     // Change la couleur des particules avec la durée de vie
     engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
 
     engine.addEmitter(emitD);
+    engine.addEmitter(emitG);
 
     return engine;
 }
@@ -676,7 +651,38 @@ function initCar(x, y, z, theta, renderingEnvironment, Loader){
 	geometry.position.z = + 2;
 
 	// Particles
-	engine = addParticleSystem();
+
+        //conf
+    var confEmitterD = {
+        cone: {
+            center: new THREE.Vector3(2.65,-6,2), // 2.5,-7,2  gauche/ profondeur / hauteur
+            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
+            radius: 0.9,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5, 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1, 7),
+        }
+    };
+    var confEmitterG = {
+        cone: {
+            center: new THREE.Vector3(-2.65,-6,2), //-3.2,-7,2
+            height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
+            radius: 0.9,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5, 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1, 7),
+        }
+    };
+
+	engine = addParticleSystem(confEmitterG, confEmitterD);
     rotationZ.add(engine.particleSystem);
 
 }
@@ -888,7 +894,38 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 		// ******* END HELICO *******
 
     //Particles
-    engine = addParticleSystem();
+
+    // conf emitters
+    var confEmitterD = {
+        cone: {
+            center: new THREE.Vector3(9,-4,4), // 2.5,-7,2  gauche/ profondeur / hauteur
+            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
+            radius: 0.2,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5, 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1, 7),
+        }
+    };
+    var confEmitterG = {
+        cone: {
+            center: new THREE.Vector3(-2.65,-6,2), //-3.2,-7,2
+            height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
+            radius: 0,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5, 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1, 7),
+        }
+    };
+
+    engine = addParticleSystem(confEmitterG, confEmitterD);
     rotationZ.add(engine.particleSystem);
 }
 
