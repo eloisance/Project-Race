@@ -432,17 +432,17 @@ function start() {
 			renderingEnvironment.camera.rotation.z = 0;
 		} else {
 			geometry.remove(renderingEnvironment.camera);
-            // Camera position
-            renderingEnvironment.camera.position.x = items[currentPlane][0];
-            renderingEnvironment.camera.position.y = items[currentPlane][1];
-            renderingEnvironment.camera.position.z = NAV.z + 40; // +vehicle.speed.length()*2
+      // Camera position
+      renderingEnvironment.camera.position.x = items[currentPlane][0];
+      renderingEnvironment.camera.position.y = items[currentPlane][1];
+      renderingEnvironment.camera.position.z = NAV.z + 40; // +vehicle.speed.length()*2
 
-            // Camera rotation
-            renderingEnvironment.camera.up = new THREE.Vector3(0,0,1);
-            renderingEnvironment.camera.lookAt( NAV );
-            // renderingEnvironment.camera.rotation.x = 1;
-            // renderingEnvironment.camera.rotation.y = NAV.y*3.14159/180.0;
-            // renderingEnvironment.camera.rotation.z = Math.PI*2;
+      // Camera rotation
+      renderingEnvironment.camera.up = new THREE.Vector3(0,0,1);
+      renderingEnvironment.camera.lookAt( NAV );
+      // renderingEnvironment.camera.rotation.x = 1;
+      // renderingEnvironment.camera.rotation.y = NAV.y*3.14159/180.0;
+      // renderingEnvironment.camera.rotation.z = Math.PI*2;
 		}
 
 		// Rendering
@@ -464,33 +464,35 @@ function start() {
 
 
 		// reset camera position
-	    embeddedCamera = true;
+	  embeddedCamera = true;
 
 		// reset tour
 		initLaps();
-        currentPlaneCheckpointsLap = [];
-        lastPlaneCheck = 0;
-        hideRaceEnd();
+    currentPlaneCheckpointsLap = [];
+    lastPlaneCheck = 0;
+    hideRaceEnd();
 		initTimerLaps();
 
 		// reset speed
-        speedChartData.setValue(0, 1, 0);
-        speedChart.draw(speedChartData, speedChartOptions);
+    speedChartData.setValue(0, 1, 0);
+    speedChart.draw(speedChartData, speedChartOptions);
 	}
 
     var old_position = [NAV.x, NAV.y];
     var current_position = [NAV.x, NAV.y];
     var time = 500; // ms
+		var speedOfVehicle;
     setInterval(function() {
         var x_vector_dep = current_position[0] - old_position[0];
         var y_vector_dep = current_position[1] - old_position[1];
         var norm = Math.sqrt(Math.pow(x_vector_dep, 2) + Math.pow(y_vector_dep, 2));
 		// Update speedometer
-        speedChartData.setValue(0, 1, Math.round(norm/(time/1000)));
+		    speedOfVehicle = Math.round(norm/(time/1000));
+        speedChartData.setValue(0, 1,speedOfVehicle );
         speedChart.draw(speedChartData, speedChartOptions);
 		// Update position
         old_position = current_position;
-        current_position = [NAV.x, NAV.y]
+        current_position = [NAV.x, NAV.y];
     }, time);
 
 
@@ -532,9 +534,12 @@ function start() {
 
     function rotateAxe() {
         setInterval(function() {
-            oAxeLeft.rotation.y = oAxeLeft.rotation.y + 2 * Math.PI * 3/100;
-            oAxeRight.rotation.y = oAxeRight.rotation.y + 2 * Math.PI * 3/100;
-            oAxeCentral.rotation.y = oAxeCentral.rotation.y + 2 * Math.PI * 3/100;
+						if(speedOfVehicle !== undefined){
+	            oAxeLeft.rotation.y = oAxeLeft.rotation.y + 2 * Math.PI * (speedOfVehicle/10)/100;
+	            oAxeRight.rotation.y = oAxeRight.rotation.y + 2 * Math.PI * (speedOfVehicle/10)/100;
+							}
+	            oAxeCentral.rotation.y = oAxeCentral.rotation.y + 2 * Math.PI * 6/100;
+
         }, 10);
     }
 
@@ -646,7 +651,7 @@ function addParticleSystem(){
 function initCar(x, y, z, theta, renderingEnvironment, Loader){
 	vehicle = new FlyingVehicle({
 		position: new THREE.Vector3(x, y, z),
-		zAngle : theta+Math.PI/2.0
+		zAngle : theta + Math.PI/2.0
 	});
 
 	position = new THREE.Object3D();
