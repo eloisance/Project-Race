@@ -448,8 +448,8 @@ function start() {
 		// position
 		if(isCar) {
 			position.position.set(NAV.x, NAV.y, NAV.z) ;
-		}else {
-			position.position.set(NAV.x, NAV.y, NAV.z+20) ;
+		} else {
+			position.position.set(NAV.x, NAV.y, NAV.z + 20);
 		}
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
@@ -570,6 +570,10 @@ function start() {
 		// Update position
         old_position = current_position;
         current_position = [NAV.x, NAV.y];
+        // Update z angle of vehicle
+		if (!isCar) {
+            position.rotation.x = Math.PI / 15 + speedOfVehicle / 300;
+		}
     }, time);
 
 

@@ -8,4 +8,4 @@
 - [x] rotation des hélices en fonction de la vitesse
 - [ ] Particules moins grandes
 - [ ] Emission des particules en fonction de la vitesse
-- [ ] Pencher helico selon sa vitesse
+- [x] Pencher helico selon sa vitesse
