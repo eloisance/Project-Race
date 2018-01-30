@@ -1,5 +1,5 @@
 /**
- *  ThreeJS test file using the ThreeRender class
+ *  ThreeJS engine file using the ThreeRender class
  */
 
 //Loads all dependencies
@@ -13,7 +13,8 @@ requirejs(['ModulesLoaderV2.js'], function()
 			                              "myJS/ThreeLoadingEnv.js",
 			                              "myJS/navZ.js",
 			                              "FlyingVehicle.js"]) ;
-
+            ModulesLoader.requireModules(["ParticleSystem.js"]) ;
+            ModulesLoader.requireModules(["Interpolators.js", "MathExt.js"]) ;
 			// Loads modules contained in includes and starts main function
 			ModulesLoader.loadModules(start) ;
 		}
@@ -61,7 +62,7 @@ var speedChartOptions = {
 
 function start() {
 	//	----------------------------------------------------------------------------
-	//	MAR 2014 - nav test
+	//	MAR 2014 - nav engine
 	//	author(s) : Cozot, R. and Lamarche, F.
 	//	date : 11/16/2014
 	//	last : 11/25/2014
@@ -78,15 +79,6 @@ function start() {
 	var CARz = 0;
 	var CARtheta = 0;
 
-	//var gui = new dat.GUI();
-	// Creates the vehicle (handled by physics)
-
-
-	// var vehicleHelico = new FlyingVehicle({
-	// 	position: new THREE.Vector3(CARx, CARy, CARz),
-	// 	zAngle : CARtheta+Math.PI/2.0
-	// });
-
 	// Rendering env
 	var renderingEnvironment =  new ThreeRenderingEnv();
 
@@ -100,9 +92,9 @@ function start() {
 	initHelico(CARx,CARy,CARz,CARtheta,renderingEnvironment,Loader);
 
 	// init chart speed
-  initSpeedometerChart();
+    initSpeedometerChart();
 
-  // init laps
+    // init laps
 	initLaps();
 
 	// initTimerLaps
@@ -115,6 +107,71 @@ function start() {
 	//Loader.loadMesh('assets','tree_Zup_02','obj',	renderingEnvironment.scene,'trees',	-340,-340,0,'double');
 	Loader.loadMesh('assets','arrivee_Zup_01','obj',	renderingEnvironment.scene,'decors',	-340,-340,0,'front');
 
+	// Système à particules : fumée des pots d'échappement
+    var conf = {
+        textureFile:"assets/particles/particle.png",
+        particlesCount: 10000,
+        blendingMode:THREE.AdditiveBlending
+    };
+
+    var confEmitterD = {
+        cone: {
+            center: new THREE.Vector3(2.65,-8,2), // 2.5,-7,2  gauche/ profondeur / hauteur
+            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
+            radius: 0.9,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5 , 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1 , 7),
+        }
+    };
+    var confEmitterG = {
+        cone: {
+            center: new THREE.Vector3(-2.65,-8,2), //-3.2,-7,2
+            height: new THREE.Vector3(0,-0.5,0), //(1.5,-4,0.3) 1.5,-15,1
+            radius: 0.9,
+            flow: 100,
+        },
+        particle: {
+            speed: new MathExt.Interval_Class(5 , 10),
+            mass: new MathExt.Interval_Class(0.1 , 0.3),
+            size: new MathExt.Interval_Class(0.1 ,1),
+            lifeTime: new MathExt.Interval_Class(1 , 7),
+        }
+    };
+    var engine = new ParticleSystem.Engine_Class(conf);
+    var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
+    var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+
+    // Modificateurs pour gérer les caractéristiques des particules
+        // Gère la durée de vie des particules
+    engine.addModifier(new ParticleSystem.LifeTimeModifier_Class());
+        // prise en compte de la vitesse
+    //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class());
+    engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+    engine.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
+
+        // Empêche les particules de traverser le plan
+    //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
+
+     //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class())
+      //engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
+    //
+     engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+     engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
+
+        // Change la couleur des particules avec la durée de vie
+     engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
+
+    engine.addEmitter(emitD);
+    engine.addEmitter(emitG);
+
+    //applyaxisangle
+
+
 	// Car
 	// car Translation
 
@@ -125,18 +182,11 @@ function start() {
 //	renderingEnvironment.camera.position.y = -25.0 ;
 //	renderingEnvironment.camera.rotation.x = 85.0*3.14159/180.0 ;
 
+	// Add particle system
+	geometry.add(engine.particleSystem);
+
 	//	Skybox
 	Loader.loadSkyBox('assets/maps',['px','nx','py','ny','pz','nz'],'jpg', renderingEnvironment.scene, 'sky',4000);
-
-
-
-
-
-
-
-
-
-
 
     //	Planes Set for Navigation
 	// 	z up
@@ -220,19 +270,15 @@ function start() {
 		}
 		if (currentlyPressedKeys[68]) { // (D) Right
 			vehicle.turnRight(1000) ;
-
 		}
 		if (currentlyPressedKeys[81]) { // (Q) Left
 			vehicle.turnLeft(1000) ;
-
 		}
 		if (currentlyPressedKeys[90]) { // (Z) Up
 			vehicle.goFront(1200, 1200) ;
-
 		}
 		if (currentlyPressedKeys[83]) { // (S) Down
 			vehicle.brake(100) ;
-
 		}
 	}
 
@@ -312,20 +358,16 @@ function start() {
 		vehicle.update(1.0/60);
 		var newPosition = vehicle.position.clone();
 
-
-
-
-
 		newPosition.sub(oldPosition);
 		// NAV
 		NAV.move(newPosition.x, newPosition.y, 150,10) ;
 		// OHelico
 		// oHelico.position.set(NAV.x, NAV.y, NAV.z) ;
 		// position
-		if(isCar){
+		if(isCar) {
 			position.position.set(NAV.x, NAV.y, NAV.z) ;
-		}else{
-				position.position.set(NAV.x, NAV.y, NAV.z+20) ;
+		}else {
+			position.position.set(NAV.x, NAV.y, NAV.z+20) ;
 		}
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
@@ -343,14 +385,14 @@ function start() {
 		//HelicoRotationZ.rotation.z = vehicleHelico.angles.z-Math.PI/2.0;
         // console.log(vehicle.speed.z) ;
 
-		if (!raceEnd){
-	  	updateTimer(clock.getElapsedTime());
+		if (!raceEnd) {
+	  	    updateTimer(clock.getElapsedTime());
 		}
+
 		// console.log('x: ' + NAV.x);
 		// console.log('y: ' + NAV.y);
 		// console.log('plane active: ' + items[NAV.findActive(NAV.x, NAV.y)]);
 		var currentPlane = parseInt(NAV.findActive(NAV.x, NAV.y));
-
 
         // check laps
         if (lastPlaneCheck !== currentPlane) {
@@ -400,6 +442,7 @@ function start() {
 
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
+        engine.animate(0.5, render);
 
         //console.log("old_pos" + old_position)
 	};
@@ -415,20 +458,18 @@ function start() {
 
 
 		// reset camera position
-	  embeddedCamera = true;
+	    embeddedCamera = true;
 
 		// reset tour
 		initLaps();
-    currentPlaneCheckpointsLap = [];
-    lastPlaneCheck = 0;
-    hideRaceEnd();
+        currentPlaneCheckpointsLap = [];
+        lastPlaneCheck = 0;
+        hideRaceEnd();
 		initTimerLaps();
 
 		// reset speed
-    speedChartData.setValue(0, 1, 0);
-    speedChart.draw(speedChartData, speedChartOptions);
-
-
+        speedChartData.setValue(0, 1, 0);
+        speedChart.draw(speedChartData, speedChartOptions);
 	}
 
     var old_position = [NAV.x, NAV.y];
@@ -447,9 +488,9 @@ function start() {
     }, time);
 
 
-    rotateAxe();
+	rotateAxe();
 
-		render();
+	render();
 
     /**
 	 * Return true if all checkpoints is in currentPlaneCheckpointsLap
@@ -797,7 +838,6 @@ function hideRaceEnd() {
 }
 
 function updateTimer(time) {
-
     document.getElementsByClassName("time")[0].innerHTML = time.toFixed(2) ;
 }
 
