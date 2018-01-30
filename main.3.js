@@ -122,10 +122,10 @@ function start() {
             flow: 100,
         },
         particle: {
-            speed: new MathExt.Interval_Class(5 , 10),
+            speed: new MathExt.Interval_Class(5, 10),
             mass: new MathExt.Interval_Class(0.1 , 0.3),
             size: new MathExt.Interval_Class(0.1 ,1),
-            lifeTime: new MathExt.Interval_Class(1 , 7),
+            lifeTime: new MathExt.Interval_Class(1, 3),
         }
     };
     var confEmitterG = {
@@ -136,15 +136,15 @@ function start() {
             flow: 100,
         },
         particle: {
-            speed: new MathExt.Interval_Class(5 , 10),
+            speed: new MathExt.Interval_Class(5, 10),
             mass: new MathExt.Interval_Class(0.1 , 0.3),
             size: new MathExt.Interval_Class(0.1 ,1),
-            lifeTime: new MathExt.Interval_Class(1 , 7),
+            lifeTime: new MathExt.Interval_Class(1, 7),
         }
     };
     var engine = new ParticleSystem.Engine_Class(conf);
     var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
-    var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
+   // var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
 
     // Modificateurs pour gérer les caractéristiques des particules
         // Gère la durée de vie des particules
@@ -157,8 +157,6 @@ function start() {
         // Empêche les particules de traverser le plan
     //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
 
-     //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class())
-      //engine.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
     //
      engine.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
      engine.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(0,2)));
@@ -167,7 +165,7 @@ function start() {
      engine.addModifier(new ParticleSystem.ColorModifier_TimeToDeath_Class(new THREE.Color("white"), new THREE.Color("red")));
 
     engine.addEmitter(emitD);
-    engine.addEmitter(emitG);
+    //engine.addEmitter(emitG);
 
     //applyaxisangle
 
@@ -292,9 +290,9 @@ function start() {
 
 	function jump() {
         console.log("Jumping");
-        console.log("geometry.position.z: " + geometry.position.z);
-        geometry.position.z += 10;
-        setTimeout(function(){ geometry.position.z -= 10; }, 1000); //1 seconde d'attente
+        console.log("geometry.position.z: " + rotationZ.position.z);
+        rotationZ.position.z += 10;
+        setTimeout(function(){ rotationZ.position.z -= 10; }, 1000); //1 seconde d'attente
 
     }
 
@@ -442,7 +440,7 @@ function start() {
 
 		// Rendering
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
-        engine.animate(0.5, render);
+        engine.animate(0.4, render);
 
         //console.log("old_pos" + old_position)
 	};
