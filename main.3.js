@@ -322,7 +322,11 @@ function start() {
 		// OHelico
 		// oHelico.position.set(NAV.x, NAV.y, NAV.z) ;
 		// position
-		position.position.set(NAV.x, NAV.y, NAV.z) ;
+		if(isCar){
+			position.position.set(NAV.x, NAV.y, NAV.z) ;
+		}else{
+				position.position.set(NAV.x, NAV.y, NAV.z+20) ;
+		}
 		// Updates the vehicle
 		vehicle.position.x = NAV.x ;
 		vehicle.position.y = NAV.y ;
@@ -548,7 +552,7 @@ function initCar(x, y, z, theta, renderingEnvironment, Loader){
 	// the car itself
 	// simple method to load an object
 	geometry = Loader.load({filename: 'assets/car_Zup_01.obj', node: rotationZ, name: 'car3'});
-	geometry.position.z= + 2;
+	geometry.position.z = + 2;
 
 
 }
@@ -559,9 +563,9 @@ function initCar(x, y, z, theta, renderingEnvironment, Loader){
 function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 	// ******* START HELICO *******
 		vehicle = new FlyingVehicle({
-			position: new THREE.Vector3(x, y, z+200),
+			position: new THREE.Vector3(x, y, z),
 			zAngle : theta+Math.PI/2.0
-		});
+		} );
 
 		position = new THREE.Object3D();
 
@@ -592,7 +596,7 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 		rotationZ = new THREE.Object3D();
 		rotationZ.name = 'helico2';
 		floorSlope.add(rotationZ);
-		rotationZ.rotation.z = theta ;
+		rotationZ.rotation.z = theta;
 
 		renderingEnvironment.addToScene(position);
 
@@ -620,7 +624,7 @@ function initHelico(x, y, z, theta, renderingEnvironment, Loader){
 		// Helico
 		position.position.x = x;
 		position.position.y = y;
-		position.position.z = z + 200;
+		position.position.z = z;
 
 		// Turbine Right
 		oTurbineRight.position.x = 8.5;
