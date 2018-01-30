@@ -402,6 +402,7 @@ function start() {
 		renderingEnvironment.renderer.render(renderingEnvironment.scene, renderingEnvironment.camera);
         //engine = addParticleSystem();
         engine.animate(0.4, render);
+        enginebis.animate(0.4,render);
 
         //console.log("old_pos" + old_position)
 	};
