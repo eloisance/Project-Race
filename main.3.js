@@ -540,32 +540,25 @@ function initSpeedometerChart() {
 function addParticleSystem(enginex){
 
     //Configurations
-
     var conf = {
         textureFile:"assets/particles/particle.png",
         particlesCount: 10000,
         blendingMode:THREE.AdditiveBlending
     };
 
-
-
     // Particle System
     enginex = new ParticleSystem.Engine_Class(conf);
-    // var emitD = new ParticleSystem.ConeEmitter_Class(confEmitterD);
-    // var emitG = new ParticleSystem.ConeEmitter_Class(confEmitterG);
 
     // Modificateurs pour gérer les caractéristiques des particules
         // Gère la durée de vie des particules
     enginex.addModifier(new ParticleSystem.LifeTimeModifier_Class());
         // prise en compte de la vitesse
-    //engine.addModifier(new ParticleSystem.ForceModifier_ResetForce_Class());
     enginex.addModifier(new ParticleSystem.ForceModifier_Weight_Class());
     enginex.addModifier(new ParticleSystem.PositionModifier_EulerItegration_Class());
 
     // Empêche les particules de traverser le plan
     //engine.addModifier(new ParticleSystem.PositionModifier_PlaneLimit_Class(THREE.Vector3( 0, 0, 0 ), 0));
 
-    //
     enginex.addModifier(new ParticleSystem.OpacityModifier_TimeToDeath_Class(new Interpolators.Linear_Class(2,0)));
     enginex.addModifier(new ParticleSystem.SizeModifier_TimeToDeath_Class(new Interpolators.Linear_Class(1,0)));
 
@@ -610,8 +603,8 @@ function initCar(x, y, z, theta, renderingEnvironment, Loader){
         //conf
     var confEmitterD = {
         cone: {
-            center: new THREE.Vector3(2.65,-6,2), // 2.5,-7,2  gauche/ profondeur / hauteur
-            height: new THREE.Vector3(0,-0.5,0), //(0.5,-15,0.5) 1.5,-15,1
+            center: new THREE.Vector3(2.65,-6,2), //  gauche/ profondeur / hauteur
+            height: new THREE.Vector3(0,-0.5,0), //
             radius: 0.9,
             flow: 100,
         },
