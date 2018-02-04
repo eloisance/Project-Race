@@ -1,0 +1,11 @@
+- [x] saut (augmentation de z) lorsque appui d'une touche (espace)
+- [ ] obstacles
+- [x] compteur de tours (check points dans l'ordre)
+- [x] timeur de tours
+- [x] fumee pot d'echappement
+- [ ] menu avec les touches lorsqu'on appuie sur Esc
+- [x] Rotation des turbines dans les virages
+- [x] rotation des hélices en fonction de la vitesse
+- [ ] Particules moins grandes
+- [ ] Emission des particules en fonction de la vitesse
+- [x] Pencher helico selon sa vitesse
