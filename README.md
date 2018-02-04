@@ -1,17 +1,16 @@
 # Project-Race
-MAR Project
+MAR Project : race game using the ThreeJS library. 
 
 ## Usage
 
-```Open the .html file in your browser.```
+Open the ```marace.10.3.html``` file in your browser.
 
-## Features
-
-- Saut avec le véhicule
-- Compteur de vitesse
-- Compteur de tours
-- Ajout d'un hélico
-- Ajout fumée pot d'échappement
+## Controls
+- ```space``` key : jump
+- ```backspace``` key : reset
+- ```p``` key : change the camera mode
+- ```n``` key : change the vehicle & reset
+- ```z```,```q```,```d```,```s``` keys : moving/braking the vehicle
 
 
 ## Authors 
