@@ -1,14 +1,17 @@
 # Project-Race
 MAR Project
 
+## Usage
+
+```Open the .html file in your browser.```
 
 ## Features
-- [ ] Menu Touches -> aborted
-- [x] Saut avec le bolide spatial
-- [x] Compteur de vitesse
-- [x] Compteur de tours
-- [ ] Ajout d'un hélico
-- [ ] Ajout fumée pot d'échappement
+
+- Saut avec le véhicule
+- Compteur de vitesse
+- Compteur de tours
+- Ajout d'un hélico
+- Ajout fumée pot d'échappement
 
 
 ## Authors 
